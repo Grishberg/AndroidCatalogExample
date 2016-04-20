@@ -24,7 +24,6 @@ public class MainActivity extends BaseActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         logoFrame = findViewById(R.id.llLogoFrame);
-        wasSaveInstanceState = savedInstanceState != null;
         if (savedInstanceState == null) {
             feedListFragment = FeedListFragment.newInstance();
             if (App.isInitiated()) {
@@ -42,6 +41,15 @@ public class MainActivity extends BaseActivity
         wasSaveInstanceState = true;
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(App.isInitiated()) {
+            wasSaveInstanceState = false;
+            initFragments();
+        }
+
+    }
 
     /**
      * Скрыть логотип инициализации
