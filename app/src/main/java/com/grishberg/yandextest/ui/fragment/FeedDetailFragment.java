@@ -25,10 +25,8 @@ import com.nostra13.universalimageloader.core.assist.FailReason;
 import com.nostra13.universalimageloader.core.display.RoundedBitmapDisplayer;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 
-public class FeedDetailFragment extends Fragment implements DataReceiveObserver{
-    private static final String ARG_FEED_ID = "param1";
+public class FeedDetailFragment extends Fragment implements DataReceiveObserver {
     private static final String TAG = FeedDetailFragment.class.getSimpleName();
-
     private FeedDao feedDao;
     private ImageLoader imageLoader;
     private ImageView ivAvatar;
@@ -39,20 +37,13 @@ public class FeedDetailFragment extends Fragment implements DataReceiveObserver{
     private SingleResult<FeedContainer> feedResult;
     private DisplayImageOptions options;
 
-    /**
-     * идентификатор выбранного фида
-     */
-    private long feedId;
-
-
     public FeedDetailFragment() {
         // Required empty public constructor
     }
 
-    public static FeedDetailFragment newInstance(long feedId) {
+    public static FeedDetailFragment newInstance() {
         FeedDetailFragment fragment = new FeedDetailFragment();
         Bundle args = new Bundle();
-        args.putLong(ARG_FEED_ID, feedId);
         fragment.setArguments(args);
         return fragment;
     }
@@ -61,9 +52,6 @@ public class FeedDetailFragment extends Fragment implements DataReceiveObserver{
     public void onCreate(Bundle savedInstanceState) {
         Log.d(TAG, "onCreate: ");
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            feedId = getArguments().getLong(ARG_FEED_ID);
-        }
         feedDao = new FeedDao();
         imageLoader = ImageLoader.getInstance();
         options = new DisplayImageOptions.Builder()
@@ -98,7 +86,7 @@ public class FeedDetailFragment extends Fragment implements DataReceiveObserver{
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        if(feedResult != null){
+        if (feedResult != null) {
             feedResult.removeDataReceiveObserver(this);
         }
     }
@@ -115,7 +103,7 @@ public class FeedDetailFragment extends Fragment implements DataReceiveObserver{
     /**
      * Заполнить поля экрана
      */
-    private void populateWidgets(){
+    private void populateWidgets() {
         // загрузка картинки
         FeedContainer item = feedResult.getItem();
         imageLoader.displayImage(item.getCoverBig(), ivAvatar, options,
@@ -145,14 +133,13 @@ public class FeedDetailFragment extends Fragment implements DataReceiveObserver{
         tvDescription.setText(item.getDescription());
         tvGenres.setText(item.getGenres());
         tvInfo.setText(String.format(
-                getContext().getString(R.string.feed_cell_info), item.getAlbums() , item.getTracks()));
-
+                getContext().getString(R.string.feed_cell_info), item.getAlbums(), item.getTracks()));
     }
 
-    public void updateData(long feedId){
+    public void updateData(long feedId) {
         feedResult = feedDao.getFeed(feedId);
         feedResult.addDataReceiveObserver(this);
-        if(feedResult.isLoaded()){
+        if (feedResult.isLoaded()) {
             Log.d(TAG, "onViewCreated: loaded immediately");
             populateWidgets();
         }
