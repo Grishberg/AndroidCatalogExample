@@ -119,7 +119,7 @@ public class FeedAdapter extends BaseRecyclerAdapter<FeedContainer, FeedAdapter.
                         int offsetBottom = v.getBottom();
                         Log.d(TAG, String.format("onClick: offsetTop = %d, offsetBottom = %d",
                                 offsetTop, offsetBottom));
-                        clickListener.onItemClicked(id, offsetTop, offsetBottom);
+                        clickListener.onItemClicked(id, offsetTop, offsetBottom, ivAvatar.getDrawable());
                     }
                 }
             });

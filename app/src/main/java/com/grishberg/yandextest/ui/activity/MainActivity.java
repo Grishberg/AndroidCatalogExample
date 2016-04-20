@@ -16,6 +16,7 @@ public class MainActivity extends BaseActivity
     private FeedListFragment feedListFragment;
     private FeedDetailFragment feedDetailFragment;
     private View logoFrame;
+    private boolean wasSaveInstanceState;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,7 +24,8 @@ public class MainActivity extends BaseActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         logoFrame = findViewById(R.id.llLogoFrame);
-        if(savedInstanceState == null){
+        wasSaveInstanceState = savedInstanceState != null;
+        if (savedInstanceState == null) {
             feedListFragment = FeedListFragment.newInstance();
             if (App.isInitiated()) {
                 initFragments();
@@ -31,6 +33,12 @@ public class MainActivity extends BaseActivity
                 showLogo();
             }
         }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        wasSaveInstanceState = true;
     }
 
     /**
@@ -44,7 +52,8 @@ public class MainActivity extends BaseActivity
     }
 
     private void initFragments() {
-        if (!feedListFragment.isAdded()) {
+        Log.d(TAG, "initFragments: wasSaveInstanceState = " + wasSaveInstanceState);
+        if (!feedListFragment.isAdded() && !wasSaveInstanceState) {
             getSupportFragmentManager()
                     .beginTransaction()
                     .add(R.id.contentMain, feedListFragment)

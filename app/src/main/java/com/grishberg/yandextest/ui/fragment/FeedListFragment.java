@@ -4,6 +4,8 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -16,6 +18,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import com.grishberg.yandextest.R;
 import com.grishberg.yandextest.controllers.FeedAdapter;
@@ -23,6 +26,7 @@ import com.grishberg.yandextest.data.db.FeedDao;
 import com.grishberg.yandextest.data.rest.RestService;
 import com.grishberg.yandextest.data.rest.RestServiceHelper;
 import com.grishberg.yandextest.framework.interfaces.OnItemClickListener;
+import com.paveldudka.util.FastBlur;
 
 public class FeedListFragment extends Fragment implements OnItemClickListener {
     private static final String TAG = FeedListFragment.class.getSimpleName();
@@ -30,6 +34,8 @@ public class FeedListFragment extends Fragment implements OnItemClickListener {
     private FeedAdapter feedAdapter;
     private FeedDao feedDao;
     private CardView cvDetailViewStub;
+    private ImageView ivStubAvatar;
+    private ImageView ivBlurBackground;
     private OnFeedFragmentInteractionListener activityListener;
     private int screenHeight;
 
@@ -84,8 +90,10 @@ public class FeedListFragment extends Fragment implements OnItemClickListener {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         Log.d(TAG, "onViewCreated: ");
         super.onViewCreated(view, savedInstanceState);
-        screenHeight = view.getMeasuredHeight();
         cvDetailViewStub = (CardView) view.findViewById(R.id.cvRoot);
+        ivStubAvatar = (ImageView) view.findViewById(R.id.ivFeedAvatar);
+        ivBlurBackground = (ImageView) view.findViewById(R.id.ivBlurBackground);
+        ivBlurBackground.setVisibility(View.GONE);
         // Инициализация recycler view
         rvFeeds = (RecyclerView) view.findViewById(R.id.rvFeeds);
         LinearLayoutManager llm = new LinearLayoutManager(getContext());
@@ -105,31 +113,84 @@ public class FeedListFragment extends Fragment implements OnItemClickListener {
     }
 
     @Override
-    public void onItemClicked(final long id, final int offsetTop, final int offsetBottom) {
+    public void onItemClicked(final long id, final int offsetTop, final int offsetBottom, Drawable drawable) {
         // 1) размыть задний план
+        blurBackground();
         // 2) отобразить заглушку на том же месте, что и выбранный элемент
         cvDetailViewStub.setVisibility(View.VISIBLE);
+        //ivStubAvatar.setImageDrawable(drawable);
+        int screenWidth = 0;
         if (getView() != null) {
             screenHeight = getView().getMeasuredHeight();
+            screenWidth = getView().getMeasuredWidth();
         }
+        final int finalScreenWidth = screenWidth;
         Log.d(TAG, "onItemClicked: height = " + screenHeight);
         ValueAnimator animation = ValueAnimator.ofFloat(0f, 1f);
-        animation.setDuration(500);
+        animation.setDuration(1000);
+        int detailAvatarHeight = (int) getContext().getResources()
+                .getDimension(R.dimen.feed_detail_image_height);
+        float k = detailAvatarHeight / (int) getContext().getResources().getDimension(R.dimen.feed_image_height);
+        int detailAvatarWidth = (int) (getContext().getResources().getDimension(R.dimen.feed_image_width) * k);
+        final int newAvatarMargin = (screenWidth - detailAvatarWidth) / 2;
         final int dTop = offsetTop;
         final int dBottom = screenHeight - offsetBottom;
+/*
+        final int imageLeft = ivStubAvatar.getLeft() + (int) getContext().getResources().getDimension(R.dimen.activity_horizontal_margin);;
+        final int imageRight = (int) getContext().getResources().getDimension(R.dimen.feed_image_width);
+        final int imageTop = offsetTop;
+        final int imageBottom = offsetBottom;
+        final int dAvatarLeft = (detailAvatarWidth - screenWidth ) / 2;
+        final int dAvatarTop = dTop;
+        final int dAvatarRight = screenWidth - detailAvatarWidth;
+        final int dAvatarBottom = detailAvatarHeight - imageBottom;
+
         cvDetailViewStub.setTop(offsetTop);
         cvDetailViewStub.setBottom(offsetBottom);
+        */
         animation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             // 3) анимация раскрытия
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
                 float i = (float) animation.getAnimatedValue();
-                Log.d(TAG, String.format("onAnimationUpdate: %f", i));
                 int newTop = (int) (offsetTop - dTop * i);
                 int newBottom = (int) (offsetBottom + dBottom * i);
-                Log.d(TAG, String.format("onAnimationUpdate: top = %d, bottom = %d", newTop, newBottom));
+                /*
+                int newAvatarTop = (int) (imageTop - dAvatarTop * i);
+                int newAvatarLeft = (int) (imageLeft - dAvatarLeft * i);
+                int newAvatarBottom = (int) (imageBottom + dAvatarBottom * i);
+                int newAvatarRight = (int) (imageRight + dAvatarRight * i);
+                */
                 cvDetailViewStub.setTop(newTop);
                 cvDetailViewStub.setBottom(newBottom);
+/*
+                if (cvDetailViewStub.getLayoutParams() instanceof ViewGroup.MarginLayoutParams) {
+                    ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) cvDetailViewStub.getLayoutParams();
+                    lp.topMargin = newTop;
+                    lp.bottomMargin = newBottom;
+                    lp.height = newBottom - newTop;
+                    //cvDetailViewStub.setLayoutParams(lp);
+
+                }
+
+                //ivStubAvatar.setLeft(newAvatarLeft);
+                //ivStubAvatar.setTop(newAvatarTop);
+                //ivStubAvatar.setRight(newAvatarRight);
+                //ivStubAvatar.setBottom(newAvatarBottom);
+
+                if (ivStubAvatar.getLayoutParams() instanceof ViewGroup.MarginLayoutParams) {
+                    ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) ivStubAvatar.getLayoutParams();
+                    lp.leftMargin = newAvatarLeft;
+                    lp.rightMargin = finalScreenWidth - newAvatarRight;
+                    lp.height = (int) (newAvatarBottom - newAvatarTop);
+                    lp.width = (int) (newAvatarRight - newAvatarLeft);
+
+                }
+                ViewGroup.LayoutParams lp = ivStubAvatar.getLayoutParams();
+                lp.height = (int) (newAvatarBottom - newAvatarTop);
+                lp.width = (int) (newAvatarRight - newAvatarLeft);
+                ivStubAvatar.setLayoutParams(lp);
+                */
             }
         });
 
@@ -144,6 +205,16 @@ public class FeedListFragment extends Fragment implements OnItemClickListener {
             }
         });
         animation.start();
+    }
+
+    private void blurBackground() {
+        ivBlurBackground.setVisibility(View.VISIBLE);
+        if (getView() == null) return;
+        // make screenshot
+        getView().setDrawingCacheEnabled(true);
+        Bitmap bitmap = Bitmap.createBitmap(getView().getDrawingCache());
+        getView().setDrawingCacheEnabled(false);
+        FastBlur.blur(getContext(), bitmap, ivBlurBackground);
     }
 
     @Override
