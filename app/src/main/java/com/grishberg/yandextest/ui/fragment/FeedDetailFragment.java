@@ -14,19 +14,26 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 
 import com.grishberg.yandextest.R;
+import com.grishberg.yandextest.data.db.FeedDao;
+import com.grishberg.yandextest.data.model.FeedContainer;
+import com.grishberg.yandextest.framework.db.DataReceiveObserver;
+import com.grishberg.yandextest.framework.db.SingleResult;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.FailReason;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 
-public class FeedDetailFragment extends Fragment {
+public class FeedDetailFragment extends Fragment implements DataReceiveObserver{
     private static final String ARG_FEED_ID = "param1";
     private static final String TAG = FeedDetailFragment.class.getSimpleName();
 
+    private FeedDao feedDao;
     private ImageLoader imageLoader;
     private ImageView ivAvatar;
     private ProgressBar pbLoading;
-
-    // TODO: Rename and change types of parameters
+    private SingleResult<FeedContainer> feedResult;
+    /**
+     * идентификатор выбранного фида
+     */
     private long feedId;
 
 
@@ -48,6 +55,7 @@ public class FeedDetailFragment extends Fragment {
         if (getArguments() != null) {
             feedId = getArguments().getLong(ARG_FEED_ID);
         }
+        feedDao = new FeedDao();
         imageLoader = ImageLoader.getInstance();
     }
 
@@ -63,49 +71,46 @@ public class FeedDetailFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         ivAvatar = (ImageView) view.findViewById(R.id.ivDetailFeedAvatar);
         pbLoading = (ProgressBar) view.findViewById(R.id.pbDetailLoading);
-        //TODO: make async loading item from DB
-        /*
-        imageLoader.displayImage(item.getCoverSmall(), holder.ivAvatar, options,
+        feedResult = feedDao.getFeed(feedId);
+        if(feedResult.isLoaded()){
+            populateWidgets();
+        }
+    }
+
+    /**
+     * Событие когда данные стали доступны
+     */
+    @Override
+    public void onDataReceived() {
+        populateWidgets();
+    }
+
+    /**
+     * Заполнить поля экрана
+     */
+    private void populateWidgets(){
+        imageLoader.displayImage(feedResult.getItem().getCoverSmall(), ivAvatar,
                 new SimpleImageLoadingListener() {
                     @Override
                     public void onLoadingStarted(String imageUri, View view) {
                         Log.d(TAG, "onLoadingStarted: ");
-                        holder.ivAvatar.setVisibility(View.INVISIBLE);
-                        holder.pbLoading.setVisibility(View.VISIBLE);
+                        ivAvatar.setVisibility(View.INVISIBLE);
+                        pbLoading.setVisibility(View.VISIBLE);
                     }
 
                     @Override
                     public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
                         Log.d(TAG, "onLoadingFailed: ");
-                        holder.ivAvatar.setVisibility(View.INVISIBLE);
-                        holder.pbLoading.setVisibility(View.GONE);
+                        ivAvatar.setVisibility(View.INVISIBLE);
+                        pbLoading.setVisibility(View.GONE);
                     }
 
                     @Override
                     public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
                         Log.d(TAG, "onLoadingComplete: ");
-                        holder.ivAvatar.setVisibility(View.VISIBLE);
-                        holder.pbLoading.setVisibility(View.GONE);
+                        ivAvatar.setVisibility(View.VISIBLE);
+                        pbLoading.setVisibility(View.GONE);
                     }
                 });
-                */
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        /*
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFeedFragmentInteractionListener");
-        }
-        */
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
     }
 }

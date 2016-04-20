@@ -112,7 +112,7 @@ public class FeedAdapter extends BaseRecyclerAdapter<FeedContainer, FeedAdapter.
             tvGenre = (TextView) itemView.findViewById(R.id.tvFeedGenre);
             tvInfo = (TextView) itemView.findViewById(R.id.tvFeedInfo);
             pbLoading = (ProgressBar) itemView.findViewById(R.id.pbLoading);
-            ivAvatar.setOnClickListener(new View.OnClickListener() {
+            itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if (clickListener != null) {

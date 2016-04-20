@@ -11,38 +11,41 @@ import io.realm.RealmObject;
 import io.realm.RealmResults;
 
 /**
+ * Реализация объекта - списка результатов из бд
+ * позволяет добавить подписчиков, которые будут уведомлены, когда данные из
+ * асинхронного запроса станут доступны.
  * Created by grishberg on 19.04.16.
  */
-public class ListResultRealm<T extends RealmObject> implements ListResult<T> {
-    private final List<DataReceiveObserver> observers;
-    private final RealmResults<T> realmResults;
+public class ListResultRealm<T extends RealmObject> extends BaseResultImpl<T>
+        implements ListResult<T> {
 
     public ListResultRealm(RealmResults<T> realmResults) {
-        observers = new LinkedList<>();
-        this.realmResults = realmResults;
-        realmResults.addChangeListener(callback);
+        super(realmResults);
     }
 
+    /**
+     * Вернуть элемент по индексу
+     * @param index
+     * @return
+     */
     @Override
     public T getItem(int index) {
         return realmResults.get(index);
     }
 
+    /**
+     * Вернуть общее количество элементов
+     * @return
+     */
     @Override
     public int getCount() {
         return realmResults.size();
     }
 
-    @Override
-    public void addDataReceiveObserver(DataReceiveObserver observer) {
-        observers.add(observer);
-    }
-
-    @Override
-    public void removeDataReceiveObserver(DataReceiveObserver observer) {
-        observers.remove(observer);
-    }
-
+    /**
+     * Возвращает состояние - загружены данные или нет
+     * @return
+     */
     @Override
     public boolean isLoaded() {
         return realmResults.isLoaded();
@@ -51,15 +54,4 @@ public class ListResultRealm<T extends RealmObject> implements ListResult<T> {
     public void release() {
         realmResults.removeChangeListener(callback);
     }
-    /**
-     * Сообщить подписчикам о том что данные обновлены
-     */
-    private RealmChangeListener callback = new RealmChangeListener() {
-        @Override
-        public void onChange() { // called once the query complete and on every update
-            for (DataReceiveObserver observer : observers) {
-                observer.onDataReceived();
-            }
-        }
-    };
 }
