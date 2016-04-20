@@ -1,34 +1,32 @@
 package com.grishberg.yandextest.ui.fragment;
 
 import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.os.ResultReceiver;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.grishberg.yandextest.R;
+import com.grishberg.yandextest.controllers.FeedAdapter;
+import com.grishberg.yandextest.data.db.FeedDao;
+import com.grishberg.yandextest.data.rest.RestService;
+import com.grishberg.yandextest.data.rest.RestServiceHelper;
+import com.grishberg.yandextest.framework.interfaces.OnItemClickListener;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link FeedListFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link FeedListFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
-public class FeedListFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+public class FeedListFragment extends Fragment implements OnItemClickListener{
+    private static final String TAG = FeedListFragment.class.getSimpleName();
+    private RecyclerView rvFeeds;
+    private FeedAdapter feedAdapter;
+    private FeedDao feedDao;
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    private OnFragmentInteractionListener mListener;
+    private OnFeedFragmentInteractionListener activityListener;
 
     public FeedListFragment() {
         // Required empty public constructor
@@ -38,27 +36,35 @@ public class FeedListFragment extends Fragment {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
      * @return A new instance of fragment FeedListFragment.
      */
-    // TODO: Rename and change types and number of parameters
-    public static FeedListFragment newInstance(String param1, String param2) {
+    public static FeedListFragment newInstance() {
         FeedListFragment fragment = new FeedListFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        Log.d(TAG, "onCreate: ");
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+        feedDao = new FeedDao();
+        feedAdapter = new FeedAdapter(getContext(), feedDao.getFeeds(), this);
+        RestServiceHelper.getFeeds(getContext(), new ResultReceiver(new Handler()) {
+            @Override
+            protected void onReceiveResult(int resultCode, Bundle resultData) {
+                Log.d(TAG, "onReceiveResult: " + resultCode);
+                if (resultData.containsKey(RestService.ERROR_KEY)) {
+                    Log.e(TAG, "onReceiveResult: Error");
+                } else {
+                    //обновить данные в адаптере
+                    if (feedAdapter != null) {
+                        feedAdapter.notifyDataSetChanged();
+                    }
+                }
+            }
+        });
     }
 
     @Override
@@ -68,42 +74,58 @@ public class FeedListFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_feed_list, container, false);
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        Log.d(TAG, "onViewCreated: ");
+        super.onViewCreated(view, savedInstanceState);
+        // Инициализация recycler view
+        rvFeeds = (RecyclerView) view.findViewById(R.id.rvFeeds);
+        LinearLayoutManager llm = new LinearLayoutManager(getContext());
+        rvFeeds.setLayoutManager(llm);
+        rvFeeds.setAdapter(feedAdapter);
     }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
+        if (context instanceof OnFeedFragmentInteractionListener) {
+            activityListener = (OnFeedFragmentInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
+                    + " must implement OnFeedFragmentInteractionListener");
+        }
+    }
+
+    @Override
+    public void onItemClicked(long id, int pos) {
+        if(activityListener != null){
+            activityListener.onFeedSelected(id);
         }
     }
 
     @Override
     public void onDetach() {
+        Log.d(TAG, "onDetach: ");
         super.onDetach();
-        mListener = null;
+        activityListener = null;
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener {
+    @Override
+    public void onDestroy() {
+        Log.d(TAG, "onDestroy: ");
+        super.onDestroy();
+        if (feedDao != null) {
+            feedDao.release();
+            feedDao = null;
+        }
+        if (feedAdapter != null) {
+            feedAdapter = null;
+        }
+    }
+
+
+    public interface OnFeedFragmentInteractionListener {
         // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
+        void onFeedSelected(long feedId);
     }
 }

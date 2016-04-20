@@ -1,5 +1,6 @@
 package com.grishberg.yandextest.framework.controllers;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -17,8 +18,10 @@ public abstract class BaseRecyclerAdapter<T, H extends RecyclerView.ViewHolder> 
     private static final String TAG = BaseRecyclerAdapter.class.getSimpleName();
     private final ListResult<T> listResult;
     private boolean isObserved;
+    private final Context context;
 
-    public BaseRecyclerAdapter(@NonNull ListResult<T> listResult) {
+    public BaseRecyclerAdapter(@NonNull Context context, @NonNull ListResult<T> listResult) {
+        this.context = context;
         this.listResult = listResult;
         listResult.addDataReceiveObserver(this);
         isObserved = true;
@@ -62,5 +65,9 @@ public abstract class BaseRecyclerAdapter<T, H extends RecyclerView.ViewHolder> 
         if(isObserved){
             listResult.removeDataReceiveObserver(this);
         }
+    }
+
+    public Context getContext() {
+        return context;
     }
 }
