@@ -124,7 +124,6 @@ public class FeedListFragment extends Fragment implements OnItemClickListener {
             screenHeight = getView().getMeasuredHeight();
             screenWidth = getView().getMeasuredWidth();
         }
-        final int finalScreenWidth = screenWidth;
         Log.d(TAG, "onItemClicked: height = " + screenHeight);
         ValueAnimator animation = ValueAnimator.ofFloat(0f, 1f);
         animation.setDuration(1000);
@@ -132,22 +131,8 @@ public class FeedListFragment extends Fragment implements OnItemClickListener {
                 .getDimension(R.dimen.feed_detail_image_height);
         float k = detailAvatarHeight / (int) getContext().getResources().getDimension(R.dimen.feed_image_height);
         int detailAvatarWidth = (int) (getContext().getResources().getDimension(R.dimen.feed_image_width) * k);
-        final int newAvatarMargin = (screenWidth - detailAvatarWidth) / 2;
         final int dTop = offsetTop;
         final int dBottom = screenHeight - offsetBottom;
-/*
-        final int imageLeft = ivStubAvatar.getLeft() + (int) getContext().getResources().getDimension(R.dimen.activity_horizontal_margin);;
-        final int imageRight = (int) getContext().getResources().getDimension(R.dimen.feed_image_width);
-        final int imageTop = offsetTop;
-        final int imageBottom = offsetBottom;
-        final int dAvatarLeft = (detailAvatarWidth - screenWidth ) / 2;
-        final int dAvatarTop = dTop;
-        final int dAvatarRight = screenWidth - detailAvatarWidth;
-        final int dAvatarBottom = detailAvatarHeight - imageBottom;
-
-        cvDetailViewStub.setTop(offsetTop);
-        cvDetailViewStub.setBottom(offsetBottom);
-        */
         animation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             // 3) анимация раскрытия
             @Override
@@ -155,42 +140,8 @@ public class FeedListFragment extends Fragment implements OnItemClickListener {
                 float i = (float) animation.getAnimatedValue();
                 int newTop = (int) (offsetTop - dTop * i);
                 int newBottom = (int) (offsetBottom + dBottom * i);
-                /*
-                int newAvatarTop = (int) (imageTop - dAvatarTop * i);
-                int newAvatarLeft = (int) (imageLeft - dAvatarLeft * i);
-                int newAvatarBottom = (int) (imageBottom + dAvatarBottom * i);
-                int newAvatarRight = (int) (imageRight + dAvatarRight * i);
-                */
                 cvDetailViewStub.setTop(newTop);
                 cvDetailViewStub.setBottom(newBottom);
-/*
-                if (cvDetailViewStub.getLayoutParams() instanceof ViewGroup.MarginLayoutParams) {
-                    ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) cvDetailViewStub.getLayoutParams();
-                    lp.topMargin = newTop;
-                    lp.bottomMargin = newBottom;
-                    lp.height = newBottom - newTop;
-                    //cvDetailViewStub.setLayoutParams(lp);
-
-                }
-
-                //ivStubAvatar.setLeft(newAvatarLeft);
-                //ivStubAvatar.setTop(newAvatarTop);
-                //ivStubAvatar.setRight(newAvatarRight);
-                //ivStubAvatar.setBottom(newAvatarBottom);
-
-                if (ivStubAvatar.getLayoutParams() instanceof ViewGroup.MarginLayoutParams) {
-                    ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) ivStubAvatar.getLayoutParams();
-                    lp.leftMargin = newAvatarLeft;
-                    lp.rightMargin = finalScreenWidth - newAvatarRight;
-                    lp.height = (int) (newAvatarBottom - newAvatarTop);
-                    lp.width = (int) (newAvatarRight - newAvatarLeft);
-
-                }
-                ViewGroup.LayoutParams lp = ivStubAvatar.getLayoutParams();
-                lp.height = (int) (newAvatarBottom - newAvatarTop);
-                lp.width = (int) (newAvatarRight - newAvatarLeft);
-                ivStubAvatar.setLayoutParams(lp);
-                */
             }
         });
 
