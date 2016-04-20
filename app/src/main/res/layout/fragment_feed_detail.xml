@@ -5,9 +5,10 @@
               android:orientation="vertical"
              tools:context="com.grishberg.yandextest.ui.fragment.FeedDetailFragment">
 
+    <!-- Аватар -->
     <FrameLayout
-        android:layout_width="@dimen/feed_image_width"
-        android:layout_height="@dimen/feed_image_height">
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/feed_detail_image_height">
 
         <ImageView
             android:id="@+id/ivDetailFeedAvatar"
@@ -23,31 +24,42 @@
             android:layout_height="wrap_content"/>
     </FrameLayout>
 
-    <LinearLayout android:orientation="horizontal"
+    <LinearLayout android:orientation="vertical"
                   android:layout_width="match_parent"
                   android:layout_height="match_parent">
 
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        <TextView
+            android:id="@+id/tvGenre"
+            android:layout_margin="@dimen/feed_detail_text_margin"
+            android:layout_gravity="start"
+            android:textColor="@color/colorTextInfo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:id="@+id/tvFeedInfo"
+            android:layout_margin="@dimen/feed_detail_text_margin"
+            android:layout_gravity="start"
+            android:textColor="@color/colorTextInfo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:text="@string/biography"
+            android:layout_margin="@dimen/feed_detail_text_margin"
+            android:textColor="@color/colorText"
+            android:textSize="@dimen/feed_detail_title_size"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:id="@+id/tvDescription"
+            android:layout_margin="@dimen/feed_detail_text_margin"
+            android:textColor="@color/colorText"
+            android:textSize="@dimen/feed_detail_text_size"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-            <TextView
-                android:id="@+id/tvFeedTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"/>
 
-            <TextView
-                android:id="@+id/tvFeedGenre"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-
-            <TextView
-                android:id="@+id/tvFeedInfo"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-
-        </LinearLayout>
     </LinearLayout>
 
 </LinearLayout>

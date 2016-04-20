@@ -4,4 +4,8 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="feed_image_width">80dp</dimen>
     <dimen name="feed_image_height">80dp</dimen>
+    <dimen name="feed_detail_image_height">200dp</dimen>
+    <dimen name="feed_detail_text_margin">10dp</dimen>
+    <dimen name="feed_detail_title_size">20sp</dimen>
+    <dimen name="feed_detail_text_size">16sp</dimen>
 </resources>

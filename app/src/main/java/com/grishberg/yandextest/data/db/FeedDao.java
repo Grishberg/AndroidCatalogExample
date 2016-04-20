@@ -74,8 +74,8 @@ public class FeedDao {
 
     public SingleResult<FeedContainer> getFeed(long id) {
         Log.d(TAG, String.format("getFeed: id=%d", id));
-        RealmQuery<FeedContainer> query = realm.where(FeedContainer.class);
-        return new SingleResultRealm<>(query.findAllSortedAsync("id", Sort.ASCENDING));
+        RealmQuery<FeedContainer> query = realm.where(FeedContainer.class).equalTo("id",id);
+        return new SingleResultRealm<>(query.findAllAsync());
     }
 
     public void release() {

@@ -5,4 +5,5 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="feed_cell_info" formatted="false">%d альбомов, %d песен</string>
     <string name="initiating">Инициализация...</string>
+    <string name="biography">Биография</string>
 </resources>

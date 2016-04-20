@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.grishberg.yandextest.R;
 import com.grishberg.yandextest.data.db.FeedDao;
@@ -30,6 +31,9 @@ public class FeedDetailFragment extends Fragment implements DataReceiveObserver{
     private ImageLoader imageLoader;
     private ImageView ivAvatar;
     private ProgressBar pbLoading;
+    private TextView tvGenres;
+    private TextView tvInfo;
+    private TextView tvDescription;
     private SingleResult<FeedContainer> feedResult;
     /**
      * идентификатор выбранного фида
@@ -51,6 +55,7 @@ public class FeedDetailFragment extends Fragment implements DataReceiveObserver{
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        Log.d(TAG, "onCreate: ");
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             feedId = getArguments().getLong(ARG_FEED_ID);
@@ -68,12 +73,27 @@ public class FeedDetailFragment extends Fragment implements DataReceiveObserver{
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        Log.d(TAG, "onViewCreated: ");
         super.onViewCreated(view, savedInstanceState);
         ivAvatar = (ImageView) view.findViewById(R.id.ivDetailFeedAvatar);
         pbLoading = (ProgressBar) view.findViewById(R.id.pbDetailLoading);
+        tvGenres = (TextView) view.findViewById(R.id.tvGenre);
+        tvInfo = (TextView) view.findViewById(R.id.tvFeedInfo);
+        tvDescription = (TextView) view.findViewById(R.id.tvDescription);
+
         feedResult = feedDao.getFeed(feedId);
+        feedResult.addDataReceiveObserver(this);
         if(feedResult.isLoaded()){
+            Log.d(TAG, "onViewCreated: loaded immediately");
             populateWidgets();
+        }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if(feedResult != null){
+            feedResult.removeDataReceiveObserver(this);
         }
     }
 
@@ -82,6 +102,7 @@ public class FeedDetailFragment extends Fragment implements DataReceiveObserver{
      */
     @Override
     public void onDataReceived() {
+        Log.d(TAG, "onDataReceived: ");
         populateWidgets();
     }
 
@@ -89,7 +110,9 @@ public class FeedDetailFragment extends Fragment implements DataReceiveObserver{
      * Заполнить поля экрана
      */
     private void populateWidgets(){
-        imageLoader.displayImage(feedResult.getItem().getCoverSmall(), ivAvatar,
+        // загрузка картинки
+        FeedContainer item = feedResult.getItem();
+        imageLoader.displayImage(item.getCoverBig(), ivAvatar,
                 new SimpleImageLoadingListener() {
                     @Override
                     public void onLoadingStarted(String imageUri, View view) {
@@ -112,5 +135,11 @@ public class FeedDetailFragment extends Fragment implements DataReceiveObserver{
                         pbLoading.setVisibility(View.GONE);
                     }
                 });
+        // заполнение элементов
+        tvDescription.setText(item.getDescription());
+        tvGenres.setText(item.getGenres());
+        tvInfo.setText(String.format(
+                getContext().getString(R.string.feed_cell_info), item.getAlbums() , item.getTracks()));
+
     }
 }
