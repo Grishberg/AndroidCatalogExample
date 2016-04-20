@@ -64,7 +64,6 @@ public class FeedAdapter extends BaseRecyclerAdapter<FeedContainer, FeedAdapter.
 
         holder.tvTitle.setText(item.getName());
         holder.id = item.getId();
-        holder.position = position;
         holder.tvGenre.setText(item.getGenres());
         holder.tvInfo.setText(String.format(
                 getContext().getString(R.string.feed_cell_info), item.getAlbums() , item.getTracks()));
@@ -116,7 +115,11 @@ public class FeedAdapter extends BaseRecyclerAdapter<FeedContainer, FeedAdapter.
                 @Override
                 public void onClick(View v) {
                     if (clickListener != null) {
-                        clickListener.onItemClicked(id, position);
+                        int offsetTop = v.getTop();
+                        int offsetBottom = v.getBottom();
+                        Log.d(TAG, String.format("onClick: offsetTop = %d, offsetBottom = %d",
+                                offsetTop, offsetBottom));
+                        clickListener.onItemClicked(id, offsetTop, offsetBottom);
                     }
                 }
             });

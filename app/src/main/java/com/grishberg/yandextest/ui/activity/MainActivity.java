@@ -19,6 +19,7 @@ public class MainActivity extends BaseActivity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d(TAG, "onCreate: ");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         logoFrame = findViewById(R.id.llLogoFrame);
@@ -37,13 +38,15 @@ public class MainActivity extends BaseActivity
      */
     @Override
     protected void onInit() {
+        Log.d(TAG, "onInit: ");
         logoFrame.setVisibility(View.GONE);
         initFragments();
     }
 
     private void initFragments() {
         if (!feedListFragment.isAdded()) {
-            getSupportFragmentManager().beginTransaction()
+            getSupportFragmentManager()
+                    .beginTransaction()
                     .add(R.id.contentMain, feedListFragment)
                     .commit();
         }
@@ -52,7 +55,7 @@ public class MainActivity extends BaseActivity
     @Override
     public void onFeedSelected(long feedId) {
         if (feedDetailFragment == null) {
-            feedDetailFragment = FeedDetailFragment.newInstance(feedId);
+            feedDetailFragment = FeedDetailFragment.newInstance();
         }
         Log.d(TAG, "onFeedSelected: id = " + feedId);
         getSupportFragmentManager()

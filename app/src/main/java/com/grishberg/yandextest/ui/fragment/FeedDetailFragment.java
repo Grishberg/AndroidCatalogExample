@@ -53,6 +53,7 @@ public class FeedDetailFragment extends Fragment implements DataReceiveObserver 
         Log.d(TAG, "onCreate: ");
         super.onCreate(savedInstanceState);
         feedDao = new FeedDao();
+        setRetainInstance(true);
         imageLoader = ImageLoader.getInstance();
         options = new DisplayImageOptions.Builder()
                 //.showImageOnLoading(R.drawable.ic_stub)

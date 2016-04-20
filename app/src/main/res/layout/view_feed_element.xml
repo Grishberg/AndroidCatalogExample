@@ -3,7 +3,7 @@
                                     xmlns:card_view="http://schemas.android.com/apk/res-auto"
                                     android:id="@+id/cvRoot"
                                     android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
+                                    android:layout_height="@dimen/feed_cell_height"
                                     android:layout_margin="8dp"
                                     card_view:cardCornerRadius="4dp"
                                     card_view:cardElevation="4dp">

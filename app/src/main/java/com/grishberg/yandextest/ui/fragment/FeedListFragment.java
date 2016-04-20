@@ -1,11 +1,15 @@
 package com.grishberg.yandextest.ui.fragment;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.os.ResultReceiver;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -20,13 +24,14 @@ import com.grishberg.yandextest.data.rest.RestService;
 import com.grishberg.yandextest.data.rest.RestServiceHelper;
 import com.grishberg.yandextest.framework.interfaces.OnItemClickListener;
 
-public class FeedListFragment extends Fragment implements OnItemClickListener{
+public class FeedListFragment extends Fragment implements OnItemClickListener {
     private static final String TAG = FeedListFragment.class.getSimpleName();
     private RecyclerView rvFeeds;
     private FeedAdapter feedAdapter;
     private FeedDao feedDao;
-
+    private CardView cvDetailViewStub;
     private OnFeedFragmentInteractionListener activityListener;
+    private int screenHeight;
 
     public FeedListFragment() {
         // Required empty public constructor
@@ -49,6 +54,7 @@ public class FeedListFragment extends Fragment implements OnItemClickListener{
     public void onCreate(Bundle savedInstanceState) {
         Log.d(TAG, "onCreate: ");
         super.onCreate(savedInstanceState);
+        setRetainInstance(true);
         feedDao = new FeedDao();
         feedAdapter = new FeedAdapter(getContext(), feedDao.getFeeds(), this);
         RestServiceHelper.getFeeds(getContext(), new ResultReceiver(new Handler()) {
@@ -78,6 +84,8 @@ public class FeedListFragment extends Fragment implements OnItemClickListener{
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         Log.d(TAG, "onViewCreated: ");
         super.onViewCreated(view, savedInstanceState);
+        screenHeight = view.getMeasuredHeight();
+        cvDetailViewStub = (CardView) view.findViewById(R.id.cvRoot);
         // Инициализация recycler view
         rvFeeds = (RecyclerView) view.findViewById(R.id.rvFeeds);
         LinearLayoutManager llm = new LinearLayoutManager(getContext());
@@ -97,10 +105,45 @@ public class FeedListFragment extends Fragment implements OnItemClickListener{
     }
 
     @Override
-    public void onItemClicked(long id, int pos) {
-        if(activityListener != null){
-            activityListener.onFeedSelected(id);
+    public void onItemClicked(final long id, final int offsetTop, final int offsetBottom) {
+        // 1) размыть задний план
+        // 2) отобразить заглушку на том же месте, что и выбранный элемент
+        cvDetailViewStub.setVisibility(View.VISIBLE);
+        if (getView() != null) {
+            screenHeight = getView().getMeasuredHeight();
         }
+        Log.d(TAG, "onItemClicked: height = " + screenHeight);
+        ValueAnimator animation = ValueAnimator.ofFloat(0f, 1f);
+        animation.setDuration(500);
+        final int dTop = offsetTop;
+        final int dBottom = screenHeight - offsetBottom;
+        cvDetailViewStub.setTop(offsetTop);
+        cvDetailViewStub.setBottom(offsetBottom);
+        animation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            // 3) анимация раскрытия
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                float i = (float) animation.getAnimatedValue();
+                Log.d(TAG, String.format("onAnimationUpdate: %f", i));
+                int newTop = (int) (offsetTop - dTop * i);
+                int newBottom = (int) (offsetBottom + dBottom * i);
+                Log.d(TAG, String.format("onAnimationUpdate: top = %d, bottom = %d", newTop, newBottom));
+                cvDetailViewStub.setTop(newTop);
+                cvDetailViewStub.setBottom(newBottom);
+            }
+        });
+
+        animation.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                // 4) вызвать каллбак и скрыть заглушку
+                if (activityListener != null) {
+                    activityListener.onFeedSelected(id);
+                }
+            }
+        });
+        animation.start();
     }
 
     @Override
@@ -122,7 +165,6 @@ public class FeedListFragment extends Fragment implements OnItemClickListener{
             feedAdapter = null;
         }
     }
-
 
     public interface OnFeedFragmentInteractionListener {
         // TODO: Update argument type and name
