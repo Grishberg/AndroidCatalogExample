@@ -37,9 +37,11 @@ public class MainActivity extends BaseActivity
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
+        Log.d(TAG, "onSaveInstanceState: ");
         super.onSaveInstanceState(outState);
         wasSaveInstanceState = true;
     }
+
 
     /**
      * Скрыть логотип инициализации

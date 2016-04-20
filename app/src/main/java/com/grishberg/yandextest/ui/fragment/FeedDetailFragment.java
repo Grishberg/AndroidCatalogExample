@@ -27,6 +27,7 @@ import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListene
 
 public class FeedDetailFragment extends Fragment implements DataReceiveObserver {
     private static final String TAG = FeedDetailFragment.class.getSimpleName();
+    public static final String FEED_ID_KEY = "FEED_ID_KEY";
     private FeedDao feedDao;
     private ImageLoader imageLoader;
     private ImageView ivAvatar;
@@ -36,6 +37,7 @@ public class FeedDetailFragment extends Fragment implements DataReceiveObserver 
     private TextView tvDescription;
     private SingleResult<FeedContainer> feedResult;
     private DisplayImageOptions options;
+    private long feedId;
 
     public FeedDetailFragment() {
         // Required empty public constructor
@@ -82,6 +84,16 @@ public class FeedDetailFragment extends Fragment implements DataReceiveObserver 
         tvGenres = (TextView) view.findViewById(R.id.tvGenre);
         tvInfo = (TextView) view.findViewById(R.id.tvFeedInfo);
         tvDescription = (TextView) view.findViewById(R.id.tvDescription);
+        if(savedInstanceState != null){
+            feedId = savedInstanceState.getLong(FEED_ID_KEY);
+            updateData(feedId);
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putLong(FEED_ID_KEY, feedId);
     }
 
     @Override
@@ -138,6 +150,7 @@ public class FeedDetailFragment extends Fragment implements DataReceiveObserver 
     }
 
     public void updateData(long feedId) {
+        this.feedId = feedId;
         feedResult = feedDao.getFeed(feedId);
         feedResult.addDataReceiveObserver(this);
         if (feedResult.isLoaded()) {
