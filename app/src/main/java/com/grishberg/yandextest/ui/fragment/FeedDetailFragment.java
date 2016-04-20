@@ -19,8 +19,10 @@ import com.grishberg.yandextest.data.db.FeedDao;
 import com.grishberg.yandextest.data.model.FeedContainer;
 import com.grishberg.yandextest.framework.db.DataReceiveObserver;
 import com.grishberg.yandextest.framework.db.SingleResult;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.FailReason;
+import com.nostra13.universalimageloader.core.display.RoundedBitmapDisplayer;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 
 public class FeedDetailFragment extends Fragment implements DataReceiveObserver{
@@ -35,6 +37,8 @@ public class FeedDetailFragment extends Fragment implements DataReceiveObserver{
     private TextView tvInfo;
     private TextView tvDescription;
     private SingleResult<FeedContainer> feedResult;
+    private DisplayImageOptions options;
+
     /**
      * идентификатор выбранного фида
      */
@@ -62,6 +66,15 @@ public class FeedDetailFragment extends Fragment implements DataReceiveObserver{
         }
         feedDao = new FeedDao();
         imageLoader = ImageLoader.getInstance();
+        options = new DisplayImageOptions.Builder()
+                //.showImageOnLoading(R.drawable.ic_stub)
+                .showImageForEmptyUri(R.drawable.ic_broken)
+                .showImageOnFail(R.drawable.ic_broken)
+                .cacheInMemory(true)
+                .cacheOnDisk(true)
+                .considerExifParams(true)
+                .bitmapConfig(Bitmap.Config.RGB_565)
+                .build();
     }
 
     @Override
@@ -105,7 +118,7 @@ public class FeedDetailFragment extends Fragment implements DataReceiveObserver{
     private void populateWidgets(){
         // загрузка картинки
         FeedContainer item = feedResult.getItem();
-        imageLoader.displayImage(item.getCoverBig(), ivAvatar,
+        imageLoader.displayImage(item.getCoverBig(), ivAvatar, options,
                 new SimpleImageLoadingListener() {
                     @Override
                     public void onLoadingStarted(String imageUri, View view) {
