@@ -80,13 +80,6 @@ public class FeedDetailFragment extends Fragment implements DataReceiveObserver{
         tvGenres = (TextView) view.findViewById(R.id.tvGenre);
         tvInfo = (TextView) view.findViewById(R.id.tvFeedInfo);
         tvDescription = (TextView) view.findViewById(R.id.tvDescription);
-
-        feedResult = feedDao.getFeed(feedId);
-        feedResult.addDataReceiveObserver(this);
-        if(feedResult.isLoaded()){
-            Log.d(TAG, "onViewCreated: loaded immediately");
-            populateWidgets();
-        }
     }
 
     @Override
@@ -141,5 +134,14 @@ public class FeedDetailFragment extends Fragment implements DataReceiveObserver{
         tvInfo.setText(String.format(
                 getContext().getString(R.string.feed_cell_info), item.getAlbums() , item.getTracks()));
 
+    }
+
+    public void updateData(long feedId){
+        feedResult = feedDao.getFeed(feedId);
+        feedResult.addDataReceiveObserver(this);
+        if(feedResult.isLoaded()){
+            Log.d(TAG, "onViewCreated: loaded immediately");
+            populateWidgets();
+        }
     }
 }

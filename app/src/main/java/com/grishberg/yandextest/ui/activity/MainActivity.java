@@ -11,22 +11,24 @@ import com.grishberg.yandextest.ui.fragment.FeedDetailFragment;
 import com.grishberg.yandextest.ui.fragment.FeedListFragment;
 
 public class MainActivity extends BaseActivity
-implements FeedListFragment.OnFeedFragmentInteractionListener {
-
+        implements FeedListFragment.OnFeedFragmentInteractionListener {
     private static final String TAG = MainActivity.class.getSimpleName();
     private FeedListFragment feedListFragment;
     private FeedDetailFragment feedDetailFragment;
     private View logoFrame;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         logoFrame = findViewById(R.id.llLogoFrame);
-
-        if(App.isInitiated()) {
-            initFragments();
-        } else {
-            showLogo();
+        if(savedInstanceState == null){
+            feedListFragment = FeedListFragment.newInstance();
+            if (App.isInitiated()) {
+                initFragments();
+            } else {
+                showLogo();
+            }
         }
     }
 
@@ -39,16 +41,17 @@ implements FeedListFragment.OnFeedFragmentInteractionListener {
         initFragments();
     }
 
-    private void initFragments(){
-        feedListFragment = FeedListFragment.newInstance();
-        getSupportFragmentManager().beginTransaction()
-                .add(R.id.contentMain, feedListFragment)
-                .commit();
+    private void initFragments() {
+        if (!feedListFragment.isAdded()) {
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.contentMain, feedListFragment)
+                    .commit();
+        }
     }
 
     @Override
     public void onFeedSelected(long feedId) {
-        if(feedDetailFragment == null){
+        if (feedDetailFragment == null) {
             feedDetailFragment = FeedDetailFragment.newInstance(feedId);
         }
         Log.d(TAG, "onFeedSelected: id = " + feedId);
@@ -58,6 +61,7 @@ implements FeedListFragment.OnFeedFragmentInteractionListener {
                 .addToBackStack(null)
                 .commit();
         getSupportFragmentManager().executePendingTransactions();
+        feedDetailFragment.updateData(feedId);
     }
 
     /**
