@@ -10,6 +10,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -35,6 +37,7 @@ public class FeedDetailFragment extends Fragment implements DataReceiveObserver 
     private TextView tvGenres;
     private TextView tvInfo;
     private TextView tvDescription;
+    private TextView tvBiography;
     private SingleResult<FeedContainer> feedResult;
     private DisplayImageOptions options;
     private long feedId;
@@ -84,6 +87,7 @@ public class FeedDetailFragment extends Fragment implements DataReceiveObserver 
         tvGenres = (TextView) view.findViewById(R.id.tvGenre);
         tvInfo = (TextView) view.findViewById(R.id.tvFeedInfo);
         tvDescription = (TextView) view.findViewById(R.id.tvDescription);
+        tvBiography = (TextView) view.findViewById(R.id.tvBiography);
         if(savedInstanceState != null){
             feedId = savedInstanceState.getLong(FEED_ID_KEY);
             updateData(feedId);
@@ -147,6 +151,13 @@ public class FeedDetailFragment extends Fragment implements DataReceiveObserver 
         tvGenres.setText(item.getGenres());
         tvInfo.setText(String.format(
                 getContext().getString(R.string.feed_cell_info), item.getAlbums(), item.getTracks()));
+        //анимация
+        Animation moveAnimation = AnimationUtils.loadAnimation(getContext(), R.anim.move);
+        tvBiography.setVisibility(View.VISIBLE);
+        tvInfo.startAnimation(moveAnimation);
+        tvBiography.startAnimation(moveAnimation);
+        tvGenres.startAnimation(moveAnimation);
+        tvDescription.startAnimation(moveAnimation);
     }
 
     public void updateData(long feedId) {

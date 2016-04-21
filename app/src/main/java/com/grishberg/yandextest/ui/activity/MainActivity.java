@@ -24,8 +24,8 @@ public class MainActivity extends BaseActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         logoFrame = findViewById(R.id.llLogoFrame);
+        feedListFragment = FeedListFragment.newInstance();
         if (savedInstanceState == null) {
-            feedListFragment = FeedListFragment.newInstance();
             if (App.isInitiated()) {
                 initFragments();
             } else {
