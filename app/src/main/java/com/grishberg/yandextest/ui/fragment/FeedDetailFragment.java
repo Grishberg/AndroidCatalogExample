@@ -88,7 +88,7 @@ public class FeedDetailFragment extends Fragment implements DataReceiveObserver 
         tvInfo = (TextView) view.findViewById(R.id.tvFeedInfo);
         tvDescription = (TextView) view.findViewById(R.id.tvDescription);
         tvBiography = (TextView) view.findViewById(R.id.tvBiography);
-        if(savedInstanceState != null){
+        if (savedInstanceState != null) {
             feedId = savedInstanceState.getLong(FEED_ID_KEY);
             updateData(feedId);
         }
@@ -121,8 +121,11 @@ public class FeedDetailFragment extends Fragment implements DataReceiveObserver 
      * Заполнить поля экрана
      */
     private void populateWidgets() {
-        // загрузка картинки
         FeedContainer item = feedResult.getItem();
+        if (getActivity() != null) {
+            getActivity().setTitle(item.getName());
+        }
+        // загрузка картинки
         imageLoader.displayImage(item.getCoverBig(), ivAvatar, options,
                 new SimpleImageLoadingListener() {
                     @Override
