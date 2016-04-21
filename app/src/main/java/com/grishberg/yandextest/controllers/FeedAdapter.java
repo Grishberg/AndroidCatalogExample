@@ -7,6 +7,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -31,6 +33,7 @@ public class FeedAdapter extends BaseRecyclerAdapter<FeedContainer, FeedAdapter.
     private ImageLoader imageLoader;
     private DisplayImageOptions options;
     private final OnItemClickListener listener;
+    private int lastPosition;
 
     public FeedAdapter(Context context,
                        ListResult<FeedContainer> listResult,
@@ -67,6 +70,45 @@ public class FeedAdapter extends BaseRecyclerAdapter<FeedContainer, FeedAdapter.
         holder.tvGenre.setText(item.getGenres());
         holder.tvInfo.setText(String.format(
                 getContext().getString(R.string.feed_cell_info), item.getAlbums() , item.getTracks()));
+        loadImage(holder, item);
+        setAnimation(holder.container, position);
+
+        holder.clickListener = listener;
+    }
+
+    /**
+     * сброс анимации у скрытых элементов
+     * иначе во время быстрого скролла анимация работает некорректно,
+     * так как переиспользуются те же элементы
+     * @param holder
+     */
+    @Override
+    public void onViewDetachedFromWindow(FeedViewHolder holder) {
+        super.onViewDetachedFromWindow(holder);
+        holder.clearAnimation();
+    }
+
+    /**
+     * Анимация появления новых элементов
+     * @param viewToAnimate
+     * @param position
+     */
+    private void setAnimation(View viewToAnimate, int position) {
+        // If the bound view wasn't previously displayed on screen, it's animated
+        if (position > lastPosition)
+        {
+            Animation animation = AnimationUtils.loadAnimation(getContext(), android.R.anim.slide_in_left);
+            viewToAnimate.startAnimation(animation);
+            lastPosition = position;
+        }
+    }
+
+    /**
+     * Загрузка изображения по ссылке
+     * @param holder
+     * @param item
+     */
+    private void loadImage(final FeedViewHolder holder, FeedContainer item) {
         imageLoader.displayImage(item.getCoverSmall(), holder.ivAvatar, options,
                 new SimpleImageLoadingListener() {
             @Override
@@ -90,13 +132,12 @@ public class FeedAdapter extends BaseRecyclerAdapter<FeedContainer, FeedAdapter.
                 holder.pbLoading.setVisibility(View.GONE);
             }
         });
-
-        holder.clickListener = listener;
     }
 
     public static class FeedViewHolder extends RecyclerView.ViewHolder {
         public long id;
         public int position;
+        View container;
         ImageView ivAvatar;
         TextView tvTitle;
         TextView tvGenre;
@@ -106,6 +147,7 @@ public class FeedAdapter extends BaseRecyclerAdapter<FeedContainer, FeedAdapter.
 
         FeedViewHolder(View itemView) {
             super(itemView);
+            container = itemView;
             ivAvatar = (ImageView) itemView.findViewById(R.id.ivFeedAvatar);
             tvTitle = (TextView) itemView.findViewById(R.id.tvFeedTitle);
             tvGenre = (TextView) itemView.findViewById(R.id.tvFeedGenre);
@@ -124,6 +166,10 @@ public class FeedAdapter extends BaseRecyclerAdapter<FeedContainer, FeedAdapter.
                 }
             });
         }
-
+        // отключение анимации
+        public void clearAnimation()
+        {
+            container.clearAnimation();
+        }
     }
 }
