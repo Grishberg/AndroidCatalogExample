@@ -66,7 +66,6 @@ public class FeedListFragment extends Fragment implements OnItemClickListener {
         Log.d(TAG, "onCreate: ");
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
-        getActivity().setTitle(R.string.app_name);
         fastBlur = new FastBlur();
         imageLoader = ImageLoader.getInstance();
         feedDao = new FeedDao();
