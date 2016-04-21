@@ -64,6 +64,7 @@ public class MainActivity extends BaseActivity
 
     private void initFragments() {
         Log.d(TAG, "initFragments: wasSaveInstanceState = " + wasSaveInstanceState);
+        Log.d(TAG, "initFragments: wasFirstFragmentInitiated = " + wasFirstFragmentInitiated);
         if (!wasSaveInstanceState && !wasFirstFragmentInitiated && App.isInitiated()) {
             wasFirstFragmentInitiated = true;
             getSupportFragmentManager()
