@@ -73,7 +73,6 @@ public class MainActivity extends BaseActivity
 
     @Override
     public void onFeedSelected(long feedId) {
-        setTitle(R.string.app_name);
         if (feedDetailFragment == null) {
             feedDetailFragment = FeedDetailFragment.newInstance();
         }

@@ -103,6 +103,7 @@ public class FeedListFragment extends Fragment implements OnItemClickListener {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         Log.d(TAG, "onViewCreated: ");
+        getActivity().setTitle(R.string.app_name);
         super.onViewCreated(view, savedInstanceState);
         cvDetailViewStub = (CardView) view.findViewById(R.id.cvRoot);
         ivBlurBackground = (ImageView) view.findViewById(R.id.ivBlurBackground);
