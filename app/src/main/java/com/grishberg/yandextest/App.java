@@ -45,6 +45,7 @@ public class App extends Application {
         init();
     }
 
+    // Инициализация библиотек
     private void init(){
 
         new AsyncTask<Void, Void, Void>(){
