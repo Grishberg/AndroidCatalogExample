@@ -5,36 +5,57 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
+import android.os.AsyncTask;
 import android.util.Log;
 import android.view.View;
 
 /**
  * Created by paveld on 3/6/14.
+ * modified by Grigory Rylov 21/04/16
  */
 public class FastBlur {
     private static final String TAG = FastBlur.class.getSimpleName();
+    private AsyncTask<Void, Void, Bitmap> blurJob;
 
-    public static void blur(Context context, Bitmap bkg, View view) {
-        long startMs = System.currentTimeMillis();
-        float scaleFactor = 1;
-        float radius = 20;
-        scaleFactor = 8;
-        radius = 2;
+    public void blur(final Context context, Bitmap bkg, final View view) {
+        final long startMs = System.currentTimeMillis();
+        final float scaleFactor = 8;
+        final int radius = 2;
 
-        Bitmap overlay = Bitmap.createBitmap((int) (bkg.getWidth()/scaleFactor),
-                (int) (bkg.getHeight()/scaleFactor), Bitmap.Config.ARGB_8888);
+        final Bitmap overlay = Bitmap.createBitmap((int) (bkg.getWidth() / scaleFactor),
+                (int) (bkg.getHeight() / scaleFactor), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(overlay);
-        canvas.translate(-view.getLeft()/scaleFactor, -view.getTop()/scaleFactor);
+        canvas.translate(-view.getLeft() / scaleFactor, -view.getTop() / scaleFactor);
         canvas.scale(1 / scaleFactor, 1 / scaleFactor);
         Paint paint = new Paint();
         paint.setFlags(Paint.FILTER_BITMAP_FLAG);
         canvas.drawBitmap(bkg, 0, 0, paint);
 
-        overlay = FastBlur.doBlur(overlay, (int)radius, true);
-        view.setBackground(new BitmapDrawable(context.getResources(), overlay));
-        Log.d(TAG, String.format("blur: %d ms", System.currentTimeMillis() - startMs));
+        blurJob = new AsyncTask<Void, Void, Bitmap>() {
+            @Override
+            protected Bitmap doInBackground(Void[] params) {
+                return FastBlur.doBlur(overlay, radius, true);
+            }
+
+            @Override
+            protected void onPostExecute(Bitmap overlay) {
+                super.onPostExecute(overlay);
+                if (!isCancelled() && overlay != null) {
+                    view.setBackground(new BitmapDrawable(context.getResources(), overlay));
+                    Log.d(TAG, String.format("blur: %d ms", System.currentTimeMillis() - startMs));
+                }
+            }
+        }.execute();
     }
 
+    /**
+     * Функция найдена по статье https://habrahabr.ru/post/215077/
+     *
+     * @param sentBitmap
+     * @param radius
+     * @param canReuseInBitmap
+     * @return
+     */
     public static Bitmap doBlur(Bitmap sentBitmap, int radius, boolean canReuseInBitmap) {
 
         // Stack Blur v1.0 from
@@ -268,5 +289,15 @@ public class FastBlur {
         bitmap.setPixels(pix, 0, w, 0, 0, w, h);
 
         return (bitmap);
+    }
+
+    /**
+     * Отмена задачи
+     */
+    public void release() {
+        Log.d(TAG, "release: ");
+        if (blurJob != null && blurJob.getStatus() != AsyncTask.Status.FINISHED) {
+            blurJob.cancel(true);
+        }
     }
 }

@@ -33,6 +33,7 @@ public class FeedAdapter extends BaseRecyclerAdapter<FeedContainer, FeedAdapter.
     private ImageLoader imageLoader;
     private DisplayImageOptions options;
     private final OnItemClickListener listener;
+    // последний анимированный элемент
     private int lastPosition;
 
     public FeedAdapter(Context context,
@@ -42,7 +43,6 @@ public class FeedAdapter extends BaseRecyclerAdapter<FeedContainer, FeedAdapter.
         this.listener = listener;
         imageLoader = ImageLoader.getInstance();
         options = new DisplayImageOptions.Builder()
-                //.showImageOnLoading(R.drawable.ic_stub)
                 .showImageForEmptyUri(R.drawable.ic_broken)
                 .showImageOnFail(R.drawable.ic_broken)
                 .cacheInMemory(true)
@@ -71,6 +71,7 @@ public class FeedAdapter extends BaseRecyclerAdapter<FeedContainer, FeedAdapter.
         holder.tvInfo.setText(String.format(
                 getContext().getString(R.string.feed_cell_info), item.getAlbums() , item.getTracks()));
         loadImage(holder, item);
+        holder.bigCoverUrl = item.getCoverBig();
         setAnimation(holder.container, position);
 
         holder.clickListener = listener;
@@ -94,10 +95,11 @@ public class FeedAdapter extends BaseRecyclerAdapter<FeedContainer, FeedAdapter.
      * @param position
      */
     private void setAnimation(View viewToAnimate, int position) {
-        // If the bound view wasn't previously displayed on screen, it's animated
+        // Отображать анимацию только для новых элементов
         if (position > lastPosition)
         {
-            Animation animation = AnimationUtils.loadAnimation(getContext(), android.R.anim.slide_in_left);
+            Animation animation = AnimationUtils.loadAnimation(getContext(),
+                    android.R.anim.slide_in_left);
             viewToAnimate.startAnimation(animation);
             lastPosition = position;
         }
@@ -135,8 +137,8 @@ public class FeedAdapter extends BaseRecyclerAdapter<FeedContainer, FeedAdapter.
     }
 
     public static class FeedViewHolder extends RecyclerView.ViewHolder {
-        public long id;
-        public int position;
+        long id;
+        String bigCoverUrl;
         View container;
         ImageView ivAvatar;
         TextView tvTitle;
@@ -161,7 +163,8 @@ public class FeedAdapter extends BaseRecyclerAdapter<FeedContainer, FeedAdapter.
                         int offsetBottom = v.getBottom();
                         Log.d(TAG, String.format("onClick: offsetTop = %d, offsetBottom = %d",
                                 offsetTop, offsetBottom));
-                        clickListener.onItemClicked(id, offsetTop, offsetBottom, ivAvatar.getDrawable());
+                        clickListener.onItemClicked(id, offsetTop, offsetBottom,
+                                ivAvatar.getDrawable(), bigCoverUrl);
                     }
                 }
             });

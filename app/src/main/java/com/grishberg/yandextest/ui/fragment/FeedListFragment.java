@@ -26,6 +26,8 @@ import com.grishberg.yandextest.data.db.FeedDao;
 import com.grishberg.yandextest.data.rest.RestService;
 import com.grishberg.yandextest.data.rest.RestServiceHelper;
 import com.grishberg.yandextest.framework.interfaces.OnItemClickListener;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
 import com.paveldudka.util.FastBlur;
 
 public class FeedListFragment extends Fragment implements OnItemClickListener {
@@ -36,8 +38,12 @@ public class FeedListFragment extends Fragment implements OnItemClickListener {
     private CardView cvDetailViewStub;
     private ImageView ivStubAvatar;
     private ImageView ivBlurBackground;
+    private ImageView imageViewContainerForPreLoad;
     private OnFeedFragmentInteractionListener activityListener;
     private int screenHeight;
+    private ImageLoader imageLoader;
+    private DisplayImageOptions options;
+    private FastBlur fastBlur;
 
     public FeedListFragment() {
         // Required empty public constructor
@@ -61,8 +67,17 @@ public class FeedListFragment extends Fragment implements OnItemClickListener {
         Log.d(TAG, "onCreate: ");
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
+        fastBlur = new FastBlur();
+        imageLoader = ImageLoader.getInstance();
         feedDao = new FeedDao();
         feedAdapter = new FeedAdapter(getContext(), feedDao.getFeeds(), this);
+        options = new DisplayImageOptions.Builder()
+                .cacheInMemory(true)
+                //.cacheOnDisk(true)
+                .considerExifParams(true)
+                .bitmapConfig(Bitmap.Config.RGB_565)
+                .build();
+        imageViewContainerForPreLoad = new ImageView(getContext());
         RestServiceHelper.getFeeds(getContext(), new ResultReceiver(new Handler()) {
             @Override
             protected void onReceiveResult(int resultCode, Bundle resultData) {
@@ -113,24 +128,26 @@ public class FeedListFragment extends Fragment implements OnItemClickListener {
     }
 
     @Override
-    public void onItemClicked(final long id, final int offsetTop, final int offsetBottom, Drawable drawable) {
-        // 1) размыть задний план
-        blurBackground();
-        // 2) отобразить заглушку на том же месте, что и выбранный элемент
-        cvDetailViewStub.setVisibility(View.VISIBLE);
-        //ivStubAvatar.setImageDrawable(drawable);
+    public void onItemClicked(final long id, final int offsetTop, final int offsetBottom,
+                              Drawable drawable,
+                              String bigCoverUrl) {
+        int detailAvatarHeight = (int) getContext().getResources()
+                .getDimension(R.dimen.feed_detail_image_height);
         int screenWidth = 0;
         if (getView() != null) {
             screenHeight = getView().getMeasuredHeight();
             screenWidth = getView().getMeasuredWidth();
         }
+        startImagePreLoading(screenWidth, detailAvatarHeight, bigCoverUrl);
+        // 1) размыть задний план
+        blurBackground();
+        // 2) отобразить заглушку на том же месте, что и выбранный элемент
+        cvDetailViewStub.setVisibility(View.VISIBLE);
+        //ivStubAvatar.setImageDrawable(drawable);
+
         Log.d(TAG, "onItemClicked: height = " + screenHeight);
         ValueAnimator animation = ValueAnimator.ofFloat(0f, 1f);
         animation.setDuration(1000);
-        int detailAvatarHeight = (int) getContext().getResources()
-                .getDimension(R.dimen.feed_detail_image_height);
-        float k = detailAvatarHeight / (int) getContext().getResources().getDimension(R.dimen.feed_image_height);
-        int detailAvatarWidth = (int) (getContext().getResources().getDimension(R.dimen.feed_image_width) * k);
         final int dTop = offsetTop;
         final int dBottom = screenHeight - offsetBottom;
         animation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
@@ -158,6 +175,21 @@ public class FeedListFragment extends Fragment implements OnItemClickListener {
         animation.start();
     }
 
+    /**
+     * Предзагрузка изображения во время анимации
+     * если изображение не успеет загрузиться, хитрый UIL поймет это и дождется выполнения операции
+     * вместо того что бы заново загружать.
+     *
+     * @param w   ширина будущего изображения
+     * @param h   высота будущего изображения
+     * @param url ссылка на изображение
+     */
+    private void startImagePreLoading(int w, int h, String url) {
+        Log.d(TAG, String.format("startImagePreLoading: preloading url=%s", url));
+        imageViewContainerForPreLoad.setLayoutParams(new ViewGroup.LayoutParams(w, h)); // define approximate image size needed for your ImageViews
+        imageLoader.displayImage(url, imageViewContainerForPreLoad, options);
+    }
+
     private void blurBackground() {
         ivBlurBackground.setVisibility(View.VISIBLE);
         if (getView() == null) return;
@@ -165,7 +197,7 @@ public class FeedListFragment extends Fragment implements OnItemClickListener {
         getView().setDrawingCacheEnabled(true);
         Bitmap bitmap = Bitmap.createBitmap(getView().getDrawingCache());
         getView().setDrawingCacheEnabled(false);
-        FastBlur.blur(getContext(), bitmap, ivBlurBackground);
+        fastBlur.blur(getContext(), bitmap, ivBlurBackground);
     }
 
     @Override
@@ -179,6 +211,10 @@ public class FeedListFragment extends Fragment implements OnItemClickListener {
     public void onDestroy() {
         Log.d(TAG, "onDestroy: ");
         super.onDestroy();
+        if (fastBlur != null) {
+            fastBlur.release();
+            fastBlur = null;
+        }
         if (feedDao != null) {
             feedDao.release();
             feedDao = null;
