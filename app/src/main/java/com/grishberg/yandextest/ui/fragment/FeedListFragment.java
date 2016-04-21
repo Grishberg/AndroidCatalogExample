@@ -36,7 +36,6 @@ public class FeedListFragment extends Fragment implements OnItemClickListener {
     private FeedAdapter feedAdapter;
     private FeedDao feedDao;
     private CardView cvDetailViewStub;
-    private ImageView ivStubAvatar;
     private ImageView ivBlurBackground;
     private ImageView imageViewContainerForPreLoad;
     private OnFeedFragmentInteractionListener activityListener;
@@ -106,7 +105,6 @@ public class FeedListFragment extends Fragment implements OnItemClickListener {
         Log.d(TAG, "onViewCreated: ");
         super.onViewCreated(view, savedInstanceState);
         cvDetailViewStub = (CardView) view.findViewById(R.id.cvRoot);
-        ivStubAvatar = (ImageView) view.findViewById(R.id.ivFeedAvatar);
         ivBlurBackground = (ImageView) view.findViewById(R.id.ivBlurBackground);
         ivBlurBackground.setVisibility(View.GONE);
         // Инициализация recycler view
@@ -190,13 +188,17 @@ public class FeedListFragment extends Fragment implements OnItemClickListener {
         imageLoader.displayImage(url, imageViewContainerForPreLoad, options);
     }
 
+    /**
+     * Размытие заднего плана
+     */
     private void blurBackground() {
         ivBlurBackground.setVisibility(View.VISIBLE);
         if (getView() == null) return;
-        // make screenshot
+        // делаем скриншот
         getView().setDrawingCacheEnabled(true);
         Bitmap bitmap = Bitmap.createBitmap(getView().getDrawingCache());
         getView().setDrawingCacheEnabled(false);
+        // запускаем задачу размытия
         fastBlur.blur(getContext(), bitmap, ivBlurBackground);
     }
 
@@ -225,7 +227,7 @@ public class FeedListFragment extends Fragment implements OnItemClickListener {
     }
 
     public interface OnFeedFragmentInteractionListener {
-        // TODO: Update argument type and name
+        // Событие для активити при выборе элемента во фрагменте
         void onFeedSelected(long feedId);
     }
 }
