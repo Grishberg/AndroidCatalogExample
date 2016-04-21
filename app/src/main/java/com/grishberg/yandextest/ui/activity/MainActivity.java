@@ -88,6 +88,12 @@ public class MainActivity extends BaseActivity
         feedDetailFragment.updateData(feedId);
     }
 
+    @Override
+    protected void onDestroy() {
+        Log.d(TAG, "onDestroy: ");
+        super.onDestroy();
+    }
+
     /**
      * Отобразить логотип инициализации
      */
