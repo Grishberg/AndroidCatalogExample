@@ -43,6 +43,7 @@ public class FeedListFragment extends Fragment implements OnItemClickListener {
     private ImageLoader imageLoader;
     private DisplayImageOptions options;
     private FastBlur fastBlur;
+    private boolean isAnimate;
 
     public FeedListFragment() {
         // Required empty public constructor
@@ -130,6 +131,8 @@ public class FeedListFragment extends Fragment implements OnItemClickListener {
     public void onItemClicked(final long id, final int offsetTop, final int offsetBottom,
                               Drawable drawable,
                               String bigCoverUrl) {
+        if(isAnimate) return;
+        isAnimate = true;
         int detailAvatarHeight = (int) getContext().getResources()
                 .getDimension(R.dimen.feed_detail_image_height);
         int screenWidth = 0;
@@ -168,6 +171,7 @@ public class FeedListFragment extends Fragment implements OnItemClickListener {
                 // 4) вызвать каллбак и скрыть заглушку
                 if (activityListener != null) {
                     activityListener.onFeedSelected(id);
+                    isAnimate = false;
                 }
             }
         });
