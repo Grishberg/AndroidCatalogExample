@@ -73,7 +73,6 @@ public class FeedListFragment extends Fragment implements OnItemClickListener {
         feedAdapter = new FeedAdapter(getContext(), feedDao.getFeeds(), this);
         options = new DisplayImageOptions.Builder()
                 .cacheInMemory(true)
-                //.cacheOnDisk(true)
                 .considerExifParams(true)
                 .bitmapConfig(Bitmap.Config.RGB_565)
                 .build();
@@ -107,10 +106,13 @@ public class FeedListFragment extends Fragment implements OnItemClickListener {
         getActivity().setTitle(R.string.app_name);
         super.onViewCreated(view, savedInstanceState);
         cvDetailViewStub = (CardView) view.findViewById(R.id.cvRoot);
+        cvDetailViewStub.setBottom(0);
+        cvDetailViewStub.setTop(0);
         ivBlurBackground = (ImageView) view.findViewById(R.id.ivBlurBackground);
-        ivBlurBackground.setVisibility(View.GONE);
+        //ivBlurBackground.setVisibility(View.GONE);
         // Инициализация recycler view
         rvFeeds = (RecyclerView) view.findViewById(R.id.rvFeeds);
+        rvFeeds.setVisibility(View.VISIBLE);
         LinearLayoutManager llm = new LinearLayoutManager(getContext());
         rvFeeds.setLayoutManager(llm);
         rvFeeds.setAdapter(feedAdapter);
@@ -127,6 +129,14 @@ public class FeedListFragment extends Fragment implements OnItemClickListener {
         }
     }
 
+    /**
+     * Событие при клике на элемент списка
+     * @param id идентификатор элемента в бд
+     * @param offsetTop верхнее смещение в пикселях
+     * @param offsetBottom нижнее смещение в пикселях
+     * @param drawable ссылка на изображение
+     * @param bigCoverUrl URL большого постера
+     */
     @Override
     public void onItemClicked(final long id, final int offsetTop, final int offsetBottom,
                               Drawable drawable,
@@ -197,7 +207,6 @@ public class FeedListFragment extends Fragment implements OnItemClickListener {
      * Размытие заднего плана
      */
     private void blurBackground() {
-        ivBlurBackground.setVisibility(View.VISIBLE);
         if (getView() == null) return;
         // делаем скриншот
         getView().setDrawingCacheEnabled(true);
@@ -205,6 +214,8 @@ public class FeedListFragment extends Fragment implements OnItemClickListener {
         getView().setDrawingCacheEnabled(false);
         // запускаем задачу размытия
         fastBlur.blur(getContext(), bitmap, ivBlurBackground);
+        // отображаем размытый фон
+        ivBlurBackground.setVisibility(View.VISIBLE);
     }
 
     @Override

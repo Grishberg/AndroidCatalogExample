@@ -17,22 +17,25 @@ public class MainActivity extends BaseActivity
     private FeedListFragment feedListFragment = FeedListFragment.newInstance();
     private FeedDetailFragment feedDetailFragment = FeedDetailFragment.newInstance();
     private View logoFrame;
-    // новая студия запускает приложения в закрытом состоянии с вызовом onSaveInstanceState
-    // данный флаг учитывает, был ли запуск в таком режиме и не позволяет проинитить фрагмент
+    /**
+     * Флаг нужен на тот случай, если после начала анимации приложение скроется и
+     * произойдет вызов функции отображения фрагмента
+     */
     private boolean wasSaveInstanceState;
-    private long feedId;
+    private long feedId = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.d(TAG, "onCreate: ");
+        Log.d(TAG, "onCreate: savedInstanceState = " + savedInstanceState);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         logoFrame = findViewById(R.id.llLogoFrame);
         if (savedInstanceState != null) {
             feedId = savedInstanceState.getLong(FEED_ID);
+        } else {
+            initListFragment();
         }
         showLogo();
-        initFragments();
     }
 
     @Override
@@ -48,7 +51,9 @@ public class MainActivity extends BaseActivity
         Log.d(TAG, "onResume: ");
         super.onResume();
         wasSaveInstanceState = false;
-        initFragments();
+        if (feedId > 0) {
+            onFeedSelected(feedId);
+        }
     }
 
     /**
@@ -58,30 +63,26 @@ public class MainActivity extends BaseActivity
     protected void onInit() {
         Log.d(TAG, "onInit: ");
         logoFrame.setVisibility(View.GONE);
-        initFragments();
+        initListFragment();
     }
 
-    private void initFragments() {
+    private void initListFragment() {
         if (!App.isInitiated() || wasSaveInstanceState) {
-            Log.d(TAG, "initFragments: not initiated");
+            Log.d(TAG, "initListFragment: not initiated");
             return;
         }
-        Log.d(TAG, "initFragments: wasSaveInstanceState = " + wasSaveInstanceState);
-
+        Log.d(TAG, "initListFragment: wasSaveInstanceState = " + wasSaveInstanceState);
         feedListFragment = (FeedListFragment) getSupportFragmentManager()
                 .findFragmentByTag(FeedListFragment.class.getSimpleName());
         if (feedListFragment == null) {
             feedListFragment = FeedListFragment.newInstance();
-        }
-        if (feedId > 0) {
-            onFeedSelected(feedId);
-            return;
         }
         if (!feedListFragment.isAdded()) {
             getSupportFragmentManager()
                     .beginTransaction()
                     .add(R.id.contentMain, feedListFragment, FeedListFragment.class.getSimpleName())
                     .commit();
+            feedId = 0;
         }
     }
 
@@ -92,7 +93,6 @@ public class MainActivity extends BaseActivity
                     .findFragmentByTag(FeedDetailFragment.class.getSimpleName());
         }
         if (!feedDetailFragment.isAdded()) {
-            feedId = 0;
             Log.d(TAG, "onFeedSelected: id = " + feedId);
             getSupportFragmentManager()
                     .beginTransaction()
@@ -102,6 +102,7 @@ public class MainActivity extends BaseActivity
                     .commit();
             getSupportFragmentManager().executePendingTransactions();
             feedDetailFragment.updateData(feedId);
+            this.feedId = 0;
         }
     }
 

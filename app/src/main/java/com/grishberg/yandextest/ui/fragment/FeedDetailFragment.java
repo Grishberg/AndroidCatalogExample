@@ -122,6 +122,9 @@ public class FeedDetailFragment extends Fragment implements DataReceiveObserver 
      */
     private void populateWidgets() {
         FeedContainer item = feedResult.getItem();
+        if(item == null){
+            Log.e(TAG, "populateWidgets: item == null");
+        }
         if (getActivity() != null) {
             getActivity().setTitle(item.getName());
         }

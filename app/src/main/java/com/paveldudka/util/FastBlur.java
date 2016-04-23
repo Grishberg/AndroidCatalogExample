@@ -8,6 +8,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 
 /**
  * Created by paveld on 3/6/14.
@@ -41,7 +42,12 @@ public class FastBlur {
             protected void onPostExecute(Bitmap overlay) {
                 super.onPostExecute(overlay);
                 if (!isCancelled() && overlay != null) {
-                    view.setBackground(new BitmapDrawable(context.getResources(), overlay));
+                    if(view instanceof ImageView){
+                        ((ImageView)view).setImageBitmap(overlay);
+
+                    }else {
+                        view.setBackground(new BitmapDrawable(context.getResources(), overlay));
+                    }
                     Log.d(TAG, String.format("blur: %d ms", System.currentTimeMillis() - startMs));
                 }
             }

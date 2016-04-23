@@ -22,7 +22,7 @@ public class SingleResultRealm<T extends RealmObject> extends BaseResultImpl<T>
      */
     @Override
     public T getItem() {
-        return realmResults.first();
+        return realmResults.size() > 0 ? realmResults.first() : null;
     }
 
     /**
@@ -31,6 +31,6 @@ public class SingleResultRealm<T extends RealmObject> extends BaseResultImpl<T>
      */
     @Override
     public boolean isLoaded() {
-        return false;
+        return realmResults.isLoaded();
     }
 }
