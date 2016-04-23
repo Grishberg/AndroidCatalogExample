@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.View;
 
 import com.grishberg.yandextest.framework.db.DataReceiveObserver;
 import com.grishberg.yandextest.framework.db.ListResult;
@@ -19,6 +20,8 @@ public abstract class BaseRecyclerAdapter<T, H extends RecyclerView.ViewHolder> 
     private final ListResult<T> listResult;
     private boolean isObserved;
     private final Context context;
+    private View emptyView;
+
 
     public BaseRecyclerAdapter(@NonNull Context context, @NonNull ListResult<T> listResult) {
         this.context = context;
@@ -26,6 +29,14 @@ public abstract class BaseRecyclerAdapter<T, H extends RecyclerView.ViewHolder> 
         listResult.addDataReceiveObserver(this);
         isObserved = true;
 
+    }
+
+    public void setEmptyView(View emptyView) {
+        this.emptyView = emptyView;
+        if(emptyView != null && getItemCount() > 0){
+            Log.d(TAG, "setEmptyView: data exists");
+            hideEmptyView();
+        }
     }
 
     protected T getItem(int position){
@@ -37,9 +48,16 @@ public abstract class BaseRecyclerAdapter<T, H extends RecyclerView.ViewHolder> 
         return listResult.getCount();
     }
 
+    /**
+     * Событие когда асинхронный запрос выполнился
+     */
     @Override
     public void onDataReceived() {
         Log.d(TAG, "onDataReceived: ");
+        // скрыть прогресс если данные получены
+        if(getItemCount() > 0){
+            hideEmptyView();
+        }
         notifyDataSetChanged();
     }
 
@@ -69,5 +87,12 @@ public abstract class BaseRecyclerAdapter<T, H extends RecyclerView.ViewHolder> 
 
     public Context getContext() {
         return context;
+    }
+
+    public void hideEmptyView(){
+        if(emptyView != null){
+            Log.d(TAG, "hideEmptyView:");
+            emptyView.setVisibility(View.GONE);
+        }
     }
 }

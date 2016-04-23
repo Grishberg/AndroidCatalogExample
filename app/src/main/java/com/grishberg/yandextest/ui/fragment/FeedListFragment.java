@@ -19,6 +19,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.grishberg.yandextest.R;
@@ -42,6 +43,7 @@ public class FeedListFragment extends Fragment implements OnItemClickListener {
     private ImageView imageViewContainerForPreLoad;
     private OnFeedFragmentInteractionListener activityListener;
     private int screenHeight;
+    private ProgressBar pbLoadingData;
     private ImageLoader imageLoader;
     private DisplayImageOptions options;
     private FastBlur fastBlur;
@@ -84,13 +86,14 @@ public class FeedListFragment extends Fragment implements OnItemClickListener {
             protected void onReceiveResult(int resultCode, Bundle resultData) {
                 Log.d(TAG, "onReceiveResult: " + resultCode);
                 if (resultData.containsKey(RestService.ERROR_KEY)) {
-                    Toast.makeText(getContext(),R.string.error_message,Toast.LENGTH_SHORT);
+                    Toast.makeText(getContext(),R.string.error_message,Toast.LENGTH_SHORT).show();
                 } else {
                     //обновить данные в адаптере
                     if (feedAdapter != null) {
                         feedAdapter.notifyDataSetChanged();
                     }
                 }
+                feedAdapter.hideEmptyView();
             }
         });
     }
@@ -111,12 +114,14 @@ public class FeedListFragment extends Fragment implements OnItemClickListener {
         cvDetailViewStub.setBottom(0);
         cvDetailViewStub.setTop(0);
         ivBlurBackground = (CustomImageView) view.findViewById(R.id.ivBlurBackground);
+        pbLoadingData = (ProgressBar) view.findViewById(R.id.pbLoadingData);
         // Инициализация recycler view
         rvFeeds = (RecyclerView) view.findViewById(R.id.rvFeeds);
         rvFeeds.setVisibility(View.VISIBLE);
         LinearLayoutManager llm = new LinearLayoutManager(getContext());
         rvFeeds.setLayoutManager(llm);
         rvFeeds.setAdapter(feedAdapter);
+        feedAdapter.setEmptyView(pbLoadingData);
     }
 
     @Override
