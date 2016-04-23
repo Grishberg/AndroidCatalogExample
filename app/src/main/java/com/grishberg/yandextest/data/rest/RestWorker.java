@@ -36,6 +36,9 @@ public class RestWorker {
         createService();
     }
 
+    /**
+     * Инициализация retrofit
+     */
     private void createService() {
         HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
         interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
@@ -54,11 +57,17 @@ public class RestWorker {
         restService = retrofit.create(RetrofitService.class);
     }
 
+    /**
+     * Извлечение данных с сервера
+     * @param intent
+     * @return
+     */
     public Serializable getFeeds(Serializable intent) {
         Log.d(TAG, "getFeeds: " + intent);
         Serializable data = null;
         int errorCode = 0;
         String errorMessage = "";
+        // несколько попыток
         for (int tries = 0; tries < TRIES_COUNT; tries++) {
             try {
                 retrofit2.Call<List<FeedRestContainer>> resp = restService.plannedTasks();

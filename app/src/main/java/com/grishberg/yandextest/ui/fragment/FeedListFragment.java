@@ -35,6 +35,7 @@ import com.paveldudka.util.FastBlur;
 
 public class FeedListFragment extends Fragment implements OnItemClickListener {
     private static final String TAG = FeedListFragment.class.getSimpleName();
+    public static final int EXPAND_ANIMATION_DURATION = 600;
     private RecyclerView rvFeeds;
     private FeedAdapter feedAdapter;
     private FeedDao feedDao;
@@ -165,7 +166,7 @@ public class FeedListFragment extends Fragment implements OnItemClickListener {
 
         Log.d(TAG, "onItemClicked: height = " + screenHeight);
         ValueAnimator animation = ValueAnimator.ofFloat(0f, 1f);
-        animation.setDuration(1000);
+        animation.setDuration(EXPAND_ANIMATION_DURATION);
         final int dTop = offsetTop;
         final int dBottom = screenHeight - offsetBottom;
         animation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
