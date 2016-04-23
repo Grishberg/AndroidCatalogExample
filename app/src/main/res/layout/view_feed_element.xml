@@ -4,7 +4,7 @@
                                     android:id="@+id/cvRoot"
                                     android:layout_width="match_parent"
                                     android:layout_height="@dimen/feed_cell_height"
-                                    android:layout_margin="8dp"
+                                    android:layout_margin="4dp"
                                     card_view:cardCornerRadius="4dp"
                                     card_view:cardElevation="4dp">
 
@@ -12,6 +12,7 @@
                   android:layout_width="match_parent"
                   android:layout_height="match_parent">
         <FrameLayout
+            android:layout_margin="8dp"
             android:layout_width="@dimen/feed_image_width"
             android:layout_height="@dimen/feed_image_height">
             <ImageView

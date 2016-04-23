@@ -26,6 +26,7 @@ import com.grishberg.yandextest.data.db.FeedDao;
 import com.grishberg.yandextest.data.rest.RestService;
 import com.grishberg.yandextest.data.rest.RestServiceHelper;
 import com.grishberg.yandextest.framework.interfaces.OnItemClickListener;
+import com.grishberg.yandextest.ui.view.CustomImageView;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.paveldudka.util.FastBlur;
@@ -36,7 +37,7 @@ public class FeedListFragment extends Fragment implements OnItemClickListener {
     private FeedAdapter feedAdapter;
     private FeedDao feedDao;
     private CardView cvDetailViewStub;
-    private ImageView ivBlurBackground;
+    private CustomImageView ivBlurBackground;
     private ImageView imageViewContainerForPreLoad;
     private OnFeedFragmentInteractionListener activityListener;
     private int screenHeight;
@@ -108,7 +109,7 @@ public class FeedListFragment extends Fragment implements OnItemClickListener {
         cvDetailViewStub = (CardView) view.findViewById(R.id.cvRoot);
         cvDetailViewStub.setBottom(0);
         cvDetailViewStub.setTop(0);
-        ivBlurBackground = (ImageView) view.findViewById(R.id.ivBlurBackground);
+        ivBlurBackground = (CustomImageView) view.findViewById(R.id.ivBlurBackground);
         //ivBlurBackground.setVisibility(View.GONE);
         // Инициализация recycler view
         rvFeeds = (RecyclerView) view.findViewById(R.id.rvFeeds);

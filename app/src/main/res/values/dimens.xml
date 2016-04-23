@@ -8,5 +8,5 @@
     <dimen name="feed_detail_text_margin">10dp</dimen>
     <dimen name="feed_detail_title_size">20sp</dimen>
     <dimen name="feed_detail_text_size">16sp</dimen>
-    <dimen name="feed_cell_height">88dp</dimen>
+    <dimen name="feed_cell_height">96dp</dimen>
 </resources>

@@ -12,7 +12,7 @@
         />
 
     <!-- background -->
-    <ImageView
+    <com.grishberg.yandextest.ui.view.CustomImageView
         android:id="@+id/ivBlurBackground"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -23,7 +23,7 @@
                                         xmlns:card_view="http://schemas.android.com/apk/res-auto"
                                         android:layout_width="match_parent"
                                         android:layout_height="@dimen/feed_cell_height"
-                                        android:layout_margin="8dp"
+                                        android:layout_margin="0dp"
                                         android:animateLayoutChanges="true"
                                         android:visibility="invisible"
                                         card_view:cardCornerRadius="4dp"
