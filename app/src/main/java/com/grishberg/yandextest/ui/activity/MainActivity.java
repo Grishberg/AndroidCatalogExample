@@ -21,7 +21,6 @@ public class MainActivity extends BaseActivity
      * Флаг нужен на тот случай, если после начала анимации приложение скроется и
      * произойдет вызов функции отображения фрагмента
      */
-    private boolean wasSaveInstanceState;
     private long feedId = -1;
 
     @Override
@@ -41,16 +40,16 @@ public class MainActivity extends BaseActivity
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         Log.d(TAG, "onSaveInstanceState: ");
-        super.onSaveInstanceState(outState);
         outState.putLong(FEED_ID, feedId);
-        wasSaveInstanceState = true;
+        //wasSaveInstanceState = true;
+        super.onSaveInstanceState(outState);
     }
 
     @Override
     protected void onResume() {
         Log.d(TAG, "onResume: ");
         super.onResume();
-        wasSaveInstanceState = false;
+        //wasSaveInstanceState = false;
         if (feedId > 0) {
             onFeedSelected(feedId);
         }
@@ -66,26 +65,10 @@ public class MainActivity extends BaseActivity
         initListFragment();
     }
 
-    private void initListFragment() {
-        if (!App.isInitiated() || wasSaveInstanceState) {
-            Log.d(TAG, "initListFragment: not initiated");
-            return;
-        }
-        Log.d(TAG, "initListFragment: wasSaveInstanceState = " + wasSaveInstanceState);
-        feedListFragment = (FeedListFragment) getSupportFragmentManager()
-                .findFragmentByTag(FeedListFragment.class.getSimpleName());
-        if (feedListFragment == null) {
-            feedListFragment = FeedListFragment.newInstance();
-        }
-        if (!feedListFragment.isAdded()) {
-            getSupportFragmentManager()
-                    .beginTransaction()
-                    .add(R.id.contentMain, feedListFragment, FeedListFragment.class.getSimpleName())
-                    .commit();
-            feedId = 0;
-        }
-    }
-
+    /**
+     * Событие во время выбора элемента списка
+     * @param feedId
+     */
     @Override
     public void onFeedSelected(long feedId) {
         if (feedDetailFragment == null) {
@@ -99,17 +82,35 @@ public class MainActivity extends BaseActivity
                     .replace(R.id.contentMain, feedDetailFragment,
                             FeedDetailFragment.class.getSimpleName())
                     .addToBackStack(null)
-                    .commit();
+                    // если использовать commit, то может возникнуть IllegalStateException во время
+                    // попытки сделать коммит после onSavedInstanceState
+                    .commitAllowingStateLoss();
             getSupportFragmentManager().executePendingTransactions();
             feedDetailFragment.updateData(feedId);
             this.feedId = 0;
         }
     }
 
-    @Override
-    protected void onDestroy() {
-        Log.d(TAG, "onDestroy: ");
-        super.onDestroy();
+    /**
+     * Отобразить фрагмент со списком
+     */
+    private void initListFragment() {
+        if (!App.isInitiated() ) {
+            Log.d(TAG, "initListFragment: not initiated");
+            return;
+        }
+        feedListFragment = (FeedListFragment) getSupportFragmentManager()
+                .findFragmentByTag(FeedListFragment.class.getSimpleName());
+        if (feedListFragment == null) {
+            feedListFragment = FeedListFragment.newInstance();
+        }
+        if (!feedListFragment.isAdded()) {
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .add(R.id.contentMain, feedListFragment, FeedListFragment.class.getSimpleName())
+                    .commit();
+            feedId = 0;
+        }
     }
 
     /**

@@ -94,6 +94,10 @@ public class FeedDetailFragment extends Fragment implements DataReceiveObserver 
         }
     }
 
+    /**
+     * Во время поворота сохраняем ИД выбранного элемента
+     * @param outState
+     */
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -166,6 +170,10 @@ public class FeedDetailFragment extends Fragment implements DataReceiveObserver 
         tvDescription.startAnimation(moveAnimation);
     }
 
+    /**
+     * Обновить данные во врогменте для выбранного feedId
+     * @param feedId
+     */
     public void updateData(long feedId) {
         this.feedId = feedId;
         feedResult = feedDao.getFeed(feedId);

@@ -6,4 +6,5 @@
     <string name="feed_cell_info" formatted="false">%d альбомов, %d песен</string>
     <string name="initiating">Инициализация...</string>
     <string name="biography">Биография</string>
+    <string name="error_message">Не удалось получить данные с сервера, попробуйте позже</string>
 </resources>

@@ -2,7 +2,6 @@ package com.grishberg.yandextest.ui.view;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BlurMaskFilter;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
@@ -10,6 +9,7 @@ import android.util.AttributeSet;
 import android.widget.ImageView;
 
 /**
+ * Кастомная вьюшка для отображения размытого фона без моргания
  * Created by grishberg on 23.04.16.
  */
 public class CustomImageView extends ImageView {

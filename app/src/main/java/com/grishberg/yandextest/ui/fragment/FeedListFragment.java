@@ -19,6 +19,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.grishberg.yandextest.R;
 import com.grishberg.yandextest.controllers.FeedAdapter;
@@ -83,7 +84,7 @@ public class FeedListFragment extends Fragment implements OnItemClickListener {
             protected void onReceiveResult(int resultCode, Bundle resultData) {
                 Log.d(TAG, "onReceiveResult: " + resultCode);
                 if (resultData.containsKey(RestService.ERROR_KEY)) {
-                    Log.e(TAG, "onReceiveResult: Error");
+                    Toast.makeText(getContext(),R.string.error_message,Toast.LENGTH_SHORT);
                 } else {
                     //обновить данные в адаптере
                     if (feedAdapter != null) {
@@ -110,7 +111,6 @@ public class FeedListFragment extends Fragment implements OnItemClickListener {
         cvDetailViewStub.setBottom(0);
         cvDetailViewStub.setTop(0);
         ivBlurBackground = (CustomImageView) view.findViewById(R.id.ivBlurBackground);
-        //ivBlurBackground.setVisibility(View.GONE);
         // Инициализация recycler view
         rvFeeds = (RecyclerView) view.findViewById(R.id.rvFeeds);
         rvFeeds.setVisibility(View.VISIBLE);
