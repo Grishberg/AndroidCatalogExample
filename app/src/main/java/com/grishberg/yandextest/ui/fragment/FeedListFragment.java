@@ -36,6 +36,7 @@ import com.paveldudka.util.FastBlur;
 public class FeedListFragment extends Fragment implements OnItemClickListener {
     private static final String TAG = FeedListFragment.class.getSimpleName();
     public static final int EXPAND_ANIMATION_DURATION = 600;
+    public static final String ARG_ONE_PANE_MODE = "ARG_ONE_PANE_MODE";
     private RecyclerView rvFeeds;
     private FeedAdapter feedAdapter;
     private FeedDao feedDao;
@@ -49,6 +50,7 @@ public class FeedListFragment extends Fragment implements OnItemClickListener {
     private DisplayImageOptions options;
     private FastBlur fastBlur;
     private boolean isAnimate;
+    private boolean isOnePaneMode;
 
     public FeedListFragment() {
         // Required empty public constructor
@@ -60,9 +62,10 @@ public class FeedListFragment extends Fragment implements OnItemClickListener {
      *
      * @return A new instance of fragment FeedListFragment.
      */
-    public static FeedListFragment newInstance() {
+    public static FeedListFragment newInstance(boolean isOnePaneMode) {
         FeedListFragment fragment = new FeedListFragment();
         Bundle args = new Bundle();
+        args.putBoolean(ARG_ONE_PANE_MODE, isOnePaneMode);
         fragment.setArguments(args);
         return fragment;
     }
@@ -72,6 +75,9 @@ public class FeedListFragment extends Fragment implements OnItemClickListener {
         Log.d(TAG, "onCreate: ");
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
+        if (getArguments() != null) {
+            isOnePaneMode = savedInstanceState.getBoolean(ARG_ONE_PANE_MODE);
+        }
         fastBlur = new FastBlur();
         imageLoader = ImageLoader.getInstance();
         feedDao = new FeedDao();
@@ -87,7 +93,7 @@ public class FeedListFragment extends Fragment implements OnItemClickListener {
             protected void onReceiveResult(int resultCode, Bundle resultData) {
                 Log.d(TAG, "onReceiveResult: " + resultCode);
                 if (resultData.containsKey(RestService.ERROR_KEY)) {
-                    Toast.makeText(getContext(),R.string.error_message,Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), R.string.error_message, Toast.LENGTH_SHORT).show();
                 } else {
                     //обновить данные в адаптере
                     if (feedAdapter != null) {
@@ -138,61 +144,70 @@ public class FeedListFragment extends Fragment implements OnItemClickListener {
 
     /**
      * Событие при клике на элемент списка
-     * @param id идентификатор элемента в бд
-     * @param offsetTop верхнее смещение в пикселях
+     *
+     * @param id           идентификатор элемента в бд
+     * @param offsetTop    верхнее смещение в пикселях
      * @param offsetBottom нижнее смещение в пикселях
-     * @param drawable ссылка на изображение
-     * @param bigCoverUrl URL большого постера
+     * @param drawable     ссылка на изображение
+     * @param bigCoverUrl  URL большого постера
      */
     @Override
     public void onItemClicked(final long id, final int offsetTop, final int offsetBottom,
                               Drawable drawable,
                               String bigCoverUrl) {
-        if(isAnimate) return;
-        isAnimate = true;
-        int detailAvatarHeight = (int) getContext().getResources()
-                .getDimension(R.dimen.feed_detail_image_height);
-        int screenWidth = 0;
-        if (getView() != null) {
-            screenHeight = getView().getMeasuredHeight();
-            screenWidth = getView().getMeasuredWidth();
-        }
-        startImagePreLoading(screenWidth, detailAvatarHeight, bigCoverUrl);
-        // 1) размыть задний план
-        blurBackground();
-        // 2) отобразить заглушку на том же месте, что и выбранный элемент
-        cvDetailViewStub.setVisibility(View.VISIBLE);
-        //ivStubAvatar.setImageDrawable(drawable);
-
-        Log.d(TAG, "onItemClicked: height = " + screenHeight);
-        ValueAnimator animation = ValueAnimator.ofFloat(0f, 1f);
-        animation.setDuration(EXPAND_ANIMATION_DURATION);
-        final int dTop = offsetTop;
-        final int dBottom = screenHeight - offsetBottom;
-        animation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            // 3) анимация раскрытия
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                float i = (float) animation.getAnimatedValue();
-                int newTop = (int) (offsetTop - dTop * i);
-                int newBottom = (int) (offsetBottom + dBottom * i);
-                cvDetailViewStub.setTop(newTop);
-                cvDetailViewStub.setBottom(newBottom);
+        if (!isOnePaneMode) {
+            openFeedDetail(id);
+        } else {
+            if (isAnimate) return;
+            isAnimate = true;
+            int detailAvatarHeight = (int) getContext().getResources()
+                    .getDimension(R.dimen.feed_detail_image_height);
+            int screenWidth = 0;
+            if (getView() != null) {
+                screenHeight = getView().getMeasuredHeight();
+                screenWidth = getView().getMeasuredWidth();
             }
-        });
+            startImagePreLoading(screenWidth, detailAvatarHeight, bigCoverUrl);
+            // 1) размыть задний план
+            blurBackground();
+            // 2) отобразить заглушку на том же месте, что и выбранный элемент
+            cvDetailViewStub.setVisibility(View.VISIBLE);
+            //ivStubAvatar.setImageDrawable(drawable);
 
-        animation.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                super.onAnimationEnd(animation);
-                // 4) вызвать каллбак и скрыть заглушку
-                if (activityListener != null) {
-                    activityListener.onFeedSelected(id);
-                    isAnimate = false;
+            Log.d(TAG, "onItemClicked: height = " + screenHeight);
+            ValueAnimator animation = ValueAnimator.ofFloat(0f, 1f);
+            animation.setDuration(EXPAND_ANIMATION_DURATION);
+            final int dTop = offsetTop;
+            final int dBottom = screenHeight - offsetBottom;
+            animation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                // 3) анимация раскрытия
+                @Override
+                public void onAnimationUpdate(ValueAnimator animation) {
+                    float i = (float) animation.getAnimatedValue();
+                    int newTop = (int) (offsetTop - dTop * i);
+                    int newBottom = (int) (offsetBottom + dBottom * i);
+                    cvDetailViewStub.setTop(newTop);
+                    cvDetailViewStub.setBottom(newBottom);
                 }
-            }
-        });
-        animation.start();
+            });
+
+            animation.addListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    super.onAnimationEnd(animation);
+                    // 4) вызвать каллбак и скрыть заглушку
+                    openFeedDetail(id);
+                }
+            });
+            animation.start();
+        }
+    }
+
+    private void openFeedDetail(long id) {
+        if (activityListener != null) {
+            activityListener.onFeedSelected(id);
+            isAnimate = false;
+        }
     }
 
     /**

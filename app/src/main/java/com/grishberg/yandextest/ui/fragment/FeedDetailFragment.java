@@ -10,8 +10,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -30,6 +32,7 @@ import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListene
 public class FeedDetailFragment extends Fragment implements DataReceiveObserver {
     private static final String TAG = FeedDetailFragment.class.getSimpleName();
     public static final String FEED_ID_KEY = "FEED_ID_KEY";
+    public static final int ANIMATION_DURATION = 1000;
     private FeedDao feedDao;
     private ImageLoader imageLoader;
     private ImageView ivAvatar;
@@ -41,6 +44,7 @@ public class FeedDetailFragment extends Fragment implements DataReceiveObserver 
     private SingleResult<FeedContainer> feedResult;
     private DisplayImageOptions options;
     private long feedId;
+    private Animation fadeIn;
 
     public FeedDetailFragment() {
         // Required empty public constructor
@@ -61,7 +65,6 @@ public class FeedDetailFragment extends Fragment implements DataReceiveObserver 
         setRetainInstance(true);
         imageLoader = ImageLoader.getInstance();
         options = new DisplayImageOptions.Builder()
-                //.showImageOnLoading(R.drawable.ic_stub)
                 .showImageForEmptyUri(R.drawable.ic_broken)
                 .showImageOnFail(R.drawable.ic_broken)
                 .cacheInMemory(true)
@@ -69,6 +72,7 @@ public class FeedDetailFragment extends Fragment implements DataReceiveObserver 
                 .considerExifParams(true)
                 .bitmapConfig(Bitmap.Config.RGB_565)
                 .build();
+        fadeIn = AnimationUtils.loadAnimation(getContext(), R.anim.fadein);
     }
 
     @Override
@@ -90,12 +94,15 @@ public class FeedDetailFragment extends Fragment implements DataReceiveObserver 
         tvBiography = (TextView) view.findViewById(R.id.tvBiography);
         if (savedInstanceState != null) {
             feedId = savedInstanceState.getLong(FEED_ID_KEY);
-            updateData(feedId);
+            if (feedId > 0) {
+                updateData(feedId);
+            }
         }
     }
 
     /**
      * Во время поворота сохраняем ИД выбранного элемента
+     *
      * @param outState
      */
     @Override
@@ -126,8 +133,9 @@ public class FeedDetailFragment extends Fragment implements DataReceiveObserver 
      */
     private void populateWidgets() {
         FeedContainer item = feedResult.getItem();
-        if(item == null){
+        if (item == null) {
             Log.e(TAG, "populateWidgets: item == null");
+            return;
         }
         if (getActivity() != null) {
             getActivity().setTitle(item.getName());
@@ -154,6 +162,7 @@ public class FeedDetailFragment extends Fragment implements DataReceiveObserver 
                         Log.d(TAG, "onLoadingComplete: ");
                         ivAvatar.setVisibility(View.VISIBLE);
                         pbLoading.setVisibility(View.GONE);
+                        ivAvatar.startAnimation(fadeIn);
                     }
                 });
         // заполнение элементов
@@ -172,6 +181,7 @@ public class FeedDetailFragment extends Fragment implements DataReceiveObserver 
 
     /**
      * Обновить данные во врогменте для выбранного feedId
+     *
      * @param feedId
      */
     public void updateData(long feedId) {

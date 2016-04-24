@@ -14,9 +14,10 @@ public class MainActivity extends BaseActivity
         implements FeedListFragment.OnFeedFragmentInteractionListener {
     private static final String TAG = MainActivity.class.getSimpleName();
     public static final String FEED_ID = "FEED_ID";
-    private FeedListFragment feedListFragment = FeedListFragment.newInstance();
-    private FeedDetailFragment feedDetailFragment = FeedDetailFragment.newInstance();
+    private FeedListFragment feedListFragment;
+    private FeedDetailFragment feedDetailFragment;
     private View logoFrame;
+    private View contentMain;
     /**
      * Флаг нужен на тот случай, если после начала анимации приложение скроется и
      * произойдет вызов функции отображения фрагмента
@@ -28,20 +29,40 @@ public class MainActivity extends BaseActivity
         Log.d(TAG, "onCreate: savedInstanceState = " + savedInstanceState);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        logoFrame = findViewById(R.id.llLogoFrame);
-        if (savedInstanceState != null) {
-            feedId = savedInstanceState.getLong(FEED_ID);
-        } else {
-            initListFragment();
+        contentMain = findViewById(R.id.contentMain);
+        if (!isInTwoPaneMode()) {
+            // если режим отображения для смартфона
+            if (savedInstanceState != null) {
+                feedId = savedInstanceState.getLong(FEED_ID);
+            } else {
+                initListFragment();
+            }
+        }  else {
+            // иначе - взять ссылки на фрагменты для дальнейшего использования
+            feedListFragment = (FeedListFragment) getSupportFragmentManager()
+                    .findFragmentById(R.id.feedFragment);
+            feedDetailFragment = (FeedDetailFragment) getSupportFragmentManager()
+                    .findFragmentById(R.id.detailFragment);
         }
+        logoFrame = findViewById(R.id.llLogoFrame);
+
         showLogo();
+    }
+
+    /**
+     * Проверка режима отображения для планшета (если есть
+     * @return
+     */
+    private boolean isInTwoPaneMode() {
+
+        return contentMain == null;
+
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         Log.d(TAG, "onSaveInstanceState: ");
         outState.putLong(FEED_ID, feedId);
-        //wasSaveInstanceState = true;
         super.onSaveInstanceState(outState);
     }
 
@@ -49,8 +70,7 @@ public class MainActivity extends BaseActivity
     protected void onResume() {
         Log.d(TAG, "onResume: ");
         super.onResume();
-        //wasSaveInstanceState = false;
-        if (feedId > 0) {
+        if (feedId > 0 && !isInTwoPaneMode()) {
             onFeedSelected(feedId);
         }
     }
@@ -62,7 +82,9 @@ public class MainActivity extends BaseActivity
     protected void onInit() {
         Log.d(TAG, "onInit: ");
         logoFrame.setVisibility(View.GONE);
-        initListFragment();
+        if (!isInTwoPaneMode()) {
+            initListFragment();
+        }
     }
 
     /**
@@ -75,20 +97,24 @@ public class MainActivity extends BaseActivity
             feedDetailFragment = (FeedDetailFragment) getSupportFragmentManager()
                     .findFragmentByTag(FeedDetailFragment.class.getSimpleName());
         }
-        if (!feedDetailFragment.isAdded()) {
-            Log.d(TAG, "onFeedSelected: id = " + feedId);
-            getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.contentMain, feedDetailFragment,
-                            FeedDetailFragment.class.getSimpleName())
-                    .addToBackStack(null)
-                    // если использовать commit, то может возникнуть IllegalStateException во время
-                    // попытки сделать коммит после onSavedInstanceState
-                    .commitAllowingStateLoss();
-            getSupportFragmentManager().executePendingTransactions();
-            feedDetailFragment.updateData(feedId);
-            this.feedId = 0;
+
+        if (!isInTwoPaneMode()) {
+            if (!feedDetailFragment.isAdded()) {
+                Log.d(TAG, "onFeedSelected: id = " + feedId);
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.contentMain, feedDetailFragment,
+                                FeedDetailFragment.class.getSimpleName())
+                        .addToBackStack(null)
+                        // если использовать commit, то может возникнуть IllegalStateException во время
+                        // попытки сделать коммит после onSavedInstanceState
+                        .commitAllowingStateLoss();
+                getSupportFragmentManager().executePendingTransactions();
+
+            }
         }
+        feedDetailFragment.updateData(feedId);
+        this.feedId = 0;
     }
 
     /**
@@ -102,7 +128,7 @@ public class MainActivity extends BaseActivity
         feedListFragment = (FeedListFragment) getSupportFragmentManager()
                 .findFragmentByTag(FeedListFragment.class.getSimpleName());
         if (feedListFragment == null) {
-            feedListFragment = FeedListFragment.newInstance();
+            feedListFragment = FeedListFragment.newInstance(true);
         }
         if (!feedListFragment.isAdded()) {
             getSupportFragmentManager()

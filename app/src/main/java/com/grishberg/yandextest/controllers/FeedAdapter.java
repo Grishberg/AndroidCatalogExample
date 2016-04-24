@@ -35,6 +35,8 @@ public class FeedAdapter extends BaseRecyclerAdapter<FeedContainer, FeedAdapter.
     private final OnItemClickListener listener;
     // последний анимированный элемент
     private int lastPosition;
+    private Animation fadeInAnimation;
+    private Animation moveAnimation;
 
     public FeedAdapter(Context context,
                        ListResult<FeedContainer> listResult,
@@ -51,6 +53,9 @@ public class FeedAdapter extends BaseRecyclerAdapter<FeedContainer, FeedAdapter.
                 .bitmapConfig(Bitmap.Config.RGB_565)
                 .displayer(new RoundedBitmapDisplayer(20))
                 .build();
+        moveAnimation = AnimationUtils.loadAnimation(getContext(),
+                android.R.anim.slide_in_left);
+        fadeInAnimation = AnimationUtils.loadAnimation(getContext(), R.anim.fadein);
     }
 
     @Override
@@ -69,7 +74,7 @@ public class FeedAdapter extends BaseRecyclerAdapter<FeedContainer, FeedAdapter.
         holder.id = item.getId();
         holder.tvGenre.setText(item.getGenres());
         holder.tvInfo.setText(String.format(
-                getContext().getString(R.string.feed_cell_info), item.getAlbums() , item.getTracks()));
+                getContext().getString(R.string.feed_cell_info), item.getAlbums(), item.getTracks()));
         loadImage(holder, item);
         holder.bigCoverUrl = item.getCoverBig();
         setAnimation(holder.container, position);
@@ -81,6 +86,7 @@ public class FeedAdapter extends BaseRecyclerAdapter<FeedContainer, FeedAdapter.
      * сброс анимации у скрытых элементов
      * иначе во время быстрого скролла анимация работает некорректно,
      * так как переиспользуются те же элементы
+     *
      * @param holder
      */
     @Override
@@ -91,51 +97,51 @@ public class FeedAdapter extends BaseRecyclerAdapter<FeedContainer, FeedAdapter.
 
     /**
      * Анимация появления новых элементов
+     *
      * @param viewToAnimate
      * @param position
      */
     private void setAnimation(View viewToAnimate, int position) {
         // Отображать анимацию только для новых элементов
-        if (position > lastPosition)
-        {
-            Animation animation = AnimationUtils.loadAnimation(getContext(),
-                    android.R.anim.slide_in_left);
-            viewToAnimate.startAnimation(animation);
+        if (position > lastPosition) {
+            viewToAnimate.startAnimation(moveAnimation);
             lastPosition = position;
         }
     }
 
     /**
      * Загрузка изображения по ссылке
+     *
      * @param holder
      * @param item
      */
     private void loadImage(final FeedViewHolder holder, FeedContainer item) {
         //оптимизация: не загружать картинку, если она уже была загружена
-        if(holder.bigCoverUrl != null && holder.bigCoverUrl.equals(item.getCoverBig())) return;
+        if (holder.bigCoverUrl != null && holder.bigCoverUrl.equals(item.getCoverBig())) return;
         imageLoader.displayImage(item.getCoverSmall(), holder.ivAvatar, options,
                 new SimpleImageLoadingListener() {
-            @Override
-            public void onLoadingStarted(String imageUri, View view) {
-                Log.d(TAG, "onLoadingStarted: ");
-                holder.ivAvatar.setVisibility(View.INVISIBLE);
-                holder.pbLoading.setVisibility(View.VISIBLE);
-            }
+                    @Override
+                    public void onLoadingStarted(String imageUri, View view) {
+                        Log.d(TAG, "onLoadingStarted: ");
+                        holder.ivAvatar.setVisibility(View.INVISIBLE);
+                        holder.pbLoading.setVisibility(View.VISIBLE);
+                    }
 
-            @Override
-            public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
-                Log.d(TAG, "onLoadingFailed: ");
-                holder.ivAvatar.setVisibility(View.INVISIBLE);
-                holder.pbLoading.setVisibility(View.GONE);
-            }
+                    @Override
+                    public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
+                        Log.d(TAG, "onLoadingFailed: ");
+                        holder.ivAvatar.setVisibility(View.INVISIBLE);
+                        holder.pbLoading.setVisibility(View.GONE);
+                    }
 
-            @Override
-            public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
-                Log.d(TAG, "onLoadingComplete: ");
-                holder.ivAvatar.setVisibility(View.VISIBLE);
-                holder.pbLoading.setVisibility(View.GONE);
-            }
-        });
+                    @Override
+                    public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
+                        Log.d(TAG, "onLoadingComplete: ");
+                        holder.ivAvatar.setVisibility(View.VISIBLE);
+                        holder.pbLoading.setVisibility(View.GONE);
+                        holder.ivAvatar.startAnimation(fadeInAnimation);
+                    }
+                });
     }
 
     public static class FeedViewHolder extends RecyclerView.ViewHolder {
@@ -171,9 +177,9 @@ public class FeedAdapter extends BaseRecyclerAdapter<FeedContainer, FeedAdapter.
                 }
             });
         }
+
         // отключение анимации
-        public void clearAnimation()
-        {
+        public void clearAnimation() {
             container.clearAnimation();
         }
     }
