@@ -76,7 +76,7 @@ public class FeedListFragment extends Fragment implements OnItemClickListener {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
         if (getArguments() != null) {
-            isOnePaneMode = savedInstanceState.getBoolean(ARG_ONE_PANE_MODE);
+            isOnePaneMode = getArguments().getBoolean(ARG_ONE_PANE_MODE);
         }
         fastBlur = new FastBlur();
         imageLoader = ImageLoader.getInstance();
