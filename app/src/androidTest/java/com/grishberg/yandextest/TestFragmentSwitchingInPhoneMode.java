@@ -7,13 +7,13 @@ import com.robotium.solo.*;
 import android.test.ActivityInstrumentationTestCase2;
 import android.view.View;
 
-public class TestFragmentSwitching extends ActivityInstrumentationTestCase2<MainActivity> {
+public class TestFragmentSwitchingInPhoneMode extends ActivityInstrumentationTestCase2<MainActivity> {
     private Solo solo;
     private static final int TIMEOUT = 20000;
     private static final int SLEEP = 1000;
 
 
-    public TestFragmentSwitching() {
+    public TestFragmentSwitchingInPhoneMode() {
         super(MainActivity.class);
     }
 
