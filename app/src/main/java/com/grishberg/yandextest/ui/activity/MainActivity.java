@@ -93,12 +93,13 @@ public class MainActivity extends BaseActivity
      */
     @Override
     public void onFeedSelected(long feedId) {
-        if (feedDetailFragment == null) {
-            feedDetailFragment = (FeedDetailFragment) getSupportFragmentManager()
-                    .findFragmentByTag(FeedDetailFragment.class.getSimpleName());
-        }
-
         if (!isInTwoPaneMode()) {
+            feedDetailFragment = (FeedDetailFragment) getSupportFragmentManager()
+                        .findFragmentByTag(FeedDetailFragment.class.getSimpleName());
+            if(feedDetailFragment == null){
+                feedDetailFragment = FeedDetailFragment.newInstance();
+            }
+
             if (!feedDetailFragment.isAdded()) {
                 Log.d(TAG, "onFeedSelected: id = " + feedId);
                 getSupportFragmentManager()

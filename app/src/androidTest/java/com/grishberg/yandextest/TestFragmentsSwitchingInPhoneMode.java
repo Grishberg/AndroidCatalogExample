@@ -5,15 +5,14 @@ import com.grishberg.yandextest.ui.fragment.FeedDetailFragment;
 import com.grishberg.yandextest.ui.fragment.FeedListFragment;
 import com.robotium.solo.*;
 import android.test.ActivityInstrumentationTestCase2;
-import android.view.View;
 
-public class TestFragmentSwitchingInPhoneMode extends ActivityInstrumentationTestCase2<MainActivity> {
+public class TestFragmentsSwitchingInPhoneMode extends ActivityInstrumentationTestCase2<MainActivity> {
     private Solo solo;
     private static final int TIMEOUT = 20000;
     private static final int SLEEP = 1000;
 
 
-    public TestFragmentSwitchingInPhoneMode() {
+    public TestFragmentsSwitchingInPhoneMode() {
         super(MainActivity.class);
     }
 
@@ -52,7 +51,7 @@ public class TestFragmentSwitchingInPhoneMode extends ActivityInstrumentationTes
         solo.goBack();
 
         // Ожидаем фрагмент FeedListFragment
-        assertTrue("FeedDetailFragment not found after back pressed",
+        assertTrue("FeedListFragment not found after back pressed",
                 solo.waitForFragmentByTag(FeedListFragment.class.getSimpleName(), TIMEOUT));
 
         // Клик на втором элементе
@@ -70,7 +69,7 @@ public class TestFragmentSwitchingInPhoneMode extends ActivityInstrumentationTes
         solo.goBack();
 
         // Ожидаем фрагмент FeedListFragment
-        assertTrue("FeedDetailFragment not found after back pressed",
+        assertTrue("FeedListFragment not found after back pressed",
                 solo.waitForFragmentByTag(FeedListFragment.class.getSimpleName(), TIMEOUT));
 
 
