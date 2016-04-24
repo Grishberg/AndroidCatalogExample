@@ -35,8 +35,6 @@ public class FeedAdapter extends BaseRecyclerAdapter<FeedContainer, FeedAdapter.
     private final OnItemClickListener listener;
     // последний анимированный элемент
     private int lastPosition;
-    private Animation fadeInAnimation;
-    private Animation moveAnimation;
 
     public FeedAdapter(Context context,
                        ListResult<FeedContainer> listResult,
@@ -53,9 +51,6 @@ public class FeedAdapter extends BaseRecyclerAdapter<FeedContainer, FeedAdapter.
                 .bitmapConfig(Bitmap.Config.RGB_565)
                 .displayer(new RoundedBitmapDisplayer(20))
                 .build();
-        moveAnimation = AnimationUtils.loadAnimation(getContext(),
-                android.R.anim.slide_in_left);
-        fadeInAnimation = AnimationUtils.loadAnimation(getContext(), R.anim.fadein);
     }
 
     @Override
@@ -104,6 +99,8 @@ public class FeedAdapter extends BaseRecyclerAdapter<FeedContainer, FeedAdapter.
     private void setAnimation(View viewToAnimate, int position) {
         // Отображать анимацию только для новых элементов
         if (position > lastPosition) {
+            Animation moveAnimation = AnimationUtils.loadAnimation(getContext(),
+                    android.R.anim.slide_in_left);
             viewToAnimate.startAnimation(moveAnimation);
             lastPosition = position;
         }
@@ -139,6 +136,8 @@ public class FeedAdapter extends BaseRecyclerAdapter<FeedContainer, FeedAdapter.
                         Log.d(TAG, "onLoadingComplete: ");
                         holder.ivAvatar.setVisibility(View.VISIBLE);
                         holder.pbLoading.setVisibility(View.GONE);
+                        Animation fadeInAnimation = AnimationUtils
+                                .loadAnimation(getContext(), R.anim.fadein);
                         holder.ivAvatar.startAnimation(fadeInAnimation);
                     }
                 });
@@ -181,6 +180,7 @@ public class FeedAdapter extends BaseRecyclerAdapter<FeedContainer, FeedAdapter.
         // отключение анимации
         public void clearAnimation() {
             container.clearAnimation();
+            ivAvatar.clearAnimation();
         }
     }
 }
