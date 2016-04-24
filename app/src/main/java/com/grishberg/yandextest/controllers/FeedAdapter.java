@@ -111,6 +111,8 @@ public class FeedAdapter extends BaseRecyclerAdapter<FeedContainer, FeedAdapter.
      * @param item
      */
     private void loadImage(final FeedViewHolder holder, FeedContainer item) {
+        //оптимизация: не загружать картинку, если она уже была загружена
+        if(holder.bigCoverUrl != null && holder.bigCoverUrl.equals(item.getCoverBig())) return;
         imageLoader.displayImage(item.getCoverSmall(), holder.ivAvatar, options,
                 new SimpleImageLoadingListener() {
             @Override
