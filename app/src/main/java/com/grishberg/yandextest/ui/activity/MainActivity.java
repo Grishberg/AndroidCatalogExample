@@ -1,6 +1,7 @@
 package com.grishberg.yandextest.ui.activity;
 
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.view.View;
 
@@ -11,7 +12,7 @@ import com.grishberg.yandextest.ui.fragment.FeedDetailFragment;
 import com.grishberg.yandextest.ui.fragment.FeedListFragment;
 
 public class MainActivity extends BaseActivity
-        implements FeedListFragment.OnFeedFragmentInteractionListener {
+        implements FragmentManager.OnBackStackChangedListener, FeedListFragment.OnFeedFragmentInteractionListener {
     private static final String TAG = MainActivity.class.getSimpleName();
     public static final String FEED_ID = "FEED_ID";
     private FeedListFragment feedListFragment;
@@ -30,6 +31,7 @@ public class MainActivity extends BaseActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         contentMain = findViewById(R.id.contentMain);
+        getSupportFragmentManager().addOnBackStackChangedListener(this);
         if (!isInTwoPaneMode()) {
             // если режим отображения для смартфона
             if (savedInstanceState != null) {
@@ -114,6 +116,8 @@ public class MainActivity extends BaseActivity
 
             }
         }
+        // отобразить кнопку вверх в App Bar, если нужно.
+        shouldDisplayHomeUp();
         feedDetailFragment.updateData(feedId);
         this.feedId = 0;
     }
@@ -140,6 +144,31 @@ public class MainActivity extends BaseActivity
         }
     }
 
+    @Override
+    public void onBackStackChanged() {
+        shouldDisplayHomeUp();
+    }
+
+    /**
+     * Оторбажение кнопки Up в App Bar
+     */
+    public void shouldDisplayHomeUp(){
+        //отображать только если есть сущности в back stack
+        boolean canBack = getSupportFragmentManager().getBackStackEntryCount()>0;
+        if(getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(canBack);
+        }
+    }
+
+    /**
+     * Событие при нажатии на кнопку Up в App Bar
+     * @return
+     */
+    @Override
+    public boolean onSupportNavigateUp() {
+        getSupportFragmentManager().popBackStack();
+        return true;
+    }
     /**
      * Отобразить логотип инициализации
      */
