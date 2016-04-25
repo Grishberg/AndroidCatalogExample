@@ -27,7 +27,12 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:visibility="gone"/>
+                android:visibility="gone"
+                android:indeterminate="true"
+                android:indeterminateTint="@color/colorSecondary"
+                android:indeterminateTintMode="src_atop"
+                tools:ignore="UnusedAttribute"
+                />
         </FrameLayout>
 
         <LinearLayout
