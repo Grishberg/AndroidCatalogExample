@@ -1,4 +1,4 @@
-package com.grishberg.yandextest.framework.db;
+package com.grishberg.yandextest.common.db;
 
 /**
  * Created by g on 20.04.16.

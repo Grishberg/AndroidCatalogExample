@@ -3,7 +3,7 @@ package com.grishberg.yandextest.data.rest;
 import android.content.Context;
 import android.support.v4.os.ResultReceiver;
 
-import com.grishberg.yandextest.framework.rest.BaseRestServiceHelper;
+import com.grishberg.yandextest.common.rest.BaseRestServiceHelper;
 
 /**
  * Created by grishberg on 19.04.16.

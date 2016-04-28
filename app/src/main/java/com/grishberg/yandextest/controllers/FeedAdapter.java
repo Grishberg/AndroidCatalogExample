@@ -15,9 +15,9 @@ import android.widget.TextView;
 
 import com.grishberg.yandextest.R;
 import com.grishberg.yandextest.data.model.FeedContainer;
-import com.grishberg.yandextest.framework.controllers.BaseRecyclerAdapter;
-import com.grishberg.yandextest.framework.db.ListResult;
-import com.grishberg.yandextest.framework.interfaces.OnItemClickListener;
+import com.grishberg.yandextest.common.controllers.BaseRecyclerAdapter;
+import com.grishberg.yandextest.common.db.ListResult;
+import com.grishberg.yandextest.common.interfaces.OnItemClickListener;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.FailReason;

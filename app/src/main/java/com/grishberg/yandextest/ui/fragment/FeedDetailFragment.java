@@ -1,8 +1,6 @@
 package com.grishberg.yandextest.ui.fragment;
 
-import android.content.Context;
 import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -10,10 +8,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -21,12 +17,11 @@ import android.widget.TextView;
 import com.grishberg.yandextest.R;
 import com.grishberg.yandextest.data.db.FeedDao;
 import com.grishberg.yandextest.data.model.FeedContainer;
-import com.grishberg.yandextest.framework.db.DataReceiveObserver;
-import com.grishberg.yandextest.framework.db.SingleResult;
+import com.grishberg.yandextest.common.db.DataReceiveObserver;
+import com.grishberg.yandextest.common.db.SingleResult;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.FailReason;
-import com.nostra13.universalimageloader.core.display.RoundedBitmapDisplayer;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 
 public class FeedDetailFragment extends Fragment implements DataReceiveObserver {

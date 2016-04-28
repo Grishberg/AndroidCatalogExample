@@ -1,4 +1,4 @@
-package com.grishberg.yandextest.framework.rest;
+package com.grishberg.yandextest.common.rest;
 
 
 

@@ -1,7 +1,7 @@
 package com.grishberg.yandextest.data.db;
 
-import com.grishberg.yandextest.framework.db.BaseResult;
-import com.grishberg.yandextest.framework.db.DataReceiveObserver;
+import com.grishberg.yandextest.common.db.BaseResult;
+import com.grishberg.yandextest.common.db.DataReceiveObserver;
 
 import java.util.LinkedList;
 import java.util.List;

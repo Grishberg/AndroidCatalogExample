@@ -1,4 +1,4 @@
-package com.grishberg.yandextest.framework.controllers;
+package com.grishberg.yandextest.common.controllers;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -6,8 +6,8 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 
-import com.grishberg.yandextest.framework.db.DataReceiveObserver;
-import com.grishberg.yandextest.framework.db.ListResult;
+import com.grishberg.yandextest.common.db.DataReceiveObserver;
+import com.grishberg.yandextest.common.db.ListResult;
 
 /**
  * базовый адаптер RecyclerView с функцией обновления данных после получения

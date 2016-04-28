@@ -1,4 +1,4 @@
-package com.grishberg.yandextest.framework.interfaces;
+package com.grishberg.yandextest.common.interfaces;
 
 import android.graphics.drawable.Drawable;
 

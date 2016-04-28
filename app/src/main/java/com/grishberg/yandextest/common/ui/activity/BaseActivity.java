@@ -1,4 +1,4 @@
-package com.grishberg.yandextest.framework.ui.activity;
+package com.grishberg.yandextest.common.ui.activity;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -10,8 +10,6 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 
 import com.grishberg.yandextest.App;
-
-import java.io.Serializable;
 
 /**
  * Created by grishberg on 20.04.16.

@@ -1,12 +1,7 @@
 package com.grishberg.yandextest.data.db;
 
-import com.grishberg.yandextest.framework.db.DataReceiveObserver;
-import com.grishberg.yandextest.framework.db.ListResult;
+import com.grishberg.yandextest.common.db.ListResult;
 
-import java.util.LinkedList;
-import java.util.List;
-
-import io.realm.RealmChangeListener;
 import io.realm.RealmObject;
 import io.realm.RealmResults;
 

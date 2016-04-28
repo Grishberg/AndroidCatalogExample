@@ -1,6 +1,6 @@
 package com.grishberg.yandextest.data.db;
 
-import com.grishberg.yandextest.framework.db.SingleResult;
+import com.grishberg.yandextest.common.db.SingleResult;
 
 import io.realm.RealmObject;
 import io.realm.RealmResults;

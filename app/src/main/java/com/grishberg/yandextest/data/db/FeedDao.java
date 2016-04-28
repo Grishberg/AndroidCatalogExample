@@ -4,11 +4,10 @@ import android.util.Log;
 
 import com.grishberg.yandextest.data.model.FeedContainer;
 import com.grishberg.yandextest.data.model.FeedRestContainer;
-import com.grishberg.yandextest.framework.db.ListResult;
-import com.grishberg.yandextest.framework.db.SingleResult;
+import com.grishberg.yandextest.common.db.ListResult;
+import com.grishberg.yandextest.common.db.SingleResult;
 
 import java.util.List;
-import java.util.StringTokenizer;
 
 import io.realm.Realm;
 import io.realm.RealmQuery;

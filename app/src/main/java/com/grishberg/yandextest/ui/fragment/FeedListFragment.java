@@ -27,7 +27,7 @@ import com.grishberg.yandextest.controllers.FeedAdapter;
 import com.grishberg.yandextest.data.db.FeedDao;
 import com.grishberg.yandextest.data.rest.RestService;
 import com.grishberg.yandextest.data.rest.RestServiceHelper;
-import com.grishberg.yandextest.framework.interfaces.OnItemClickListener;
+import com.grishberg.yandextest.common.interfaces.OnItemClickListener;
 import com.grishberg.yandextest.ui.view.CustomImageView;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;

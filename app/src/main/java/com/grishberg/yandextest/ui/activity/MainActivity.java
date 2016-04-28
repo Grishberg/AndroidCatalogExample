@@ -7,7 +7,7 @@ import android.view.View;
 
 import com.grishberg.yandextest.App;
 import com.grishberg.yandextest.R;
-import com.grishberg.yandextest.framework.ui.activity.BaseActivity;
+import com.grishberg.yandextest.common.ui.activity.BaseActivity;
 import com.grishberg.yandextest.ui.fragment.FeedDetailFragment;
 import com.grishberg.yandextest.ui.fragment.FeedListFragment;
 

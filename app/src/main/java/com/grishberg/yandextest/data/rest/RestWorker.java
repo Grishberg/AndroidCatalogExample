@@ -8,7 +8,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.grishberg.yandextest.data.db.FeedDao;
 import com.grishberg.yandextest.data.model.FeedRestContainer;
-import com.grishberg.yandextest.framework.rest.HttpLoggingInterceptor;
+import com.grishberg.yandextest.common.rest.HttpLoggingInterceptor;
 
 import java.io.Serializable;
 import java.net.ConnectException;
