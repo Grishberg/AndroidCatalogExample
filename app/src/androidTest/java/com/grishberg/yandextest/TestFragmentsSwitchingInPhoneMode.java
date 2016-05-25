@@ -47,7 +47,7 @@ public class TestFragmentsSwitchingInPhoneMode extends ActivityInstrumentationTe
         assertTrue("rock genre not found",
                 solo.searchText("rock"));
 
-        // Нажимаем назад
+        // Нажимаем назад-
         solo.goBack();
 
         // Ожидаем фрагмент FeedListFragment
