@@ -26,7 +26,7 @@ import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListene
 
 /**
  * Адаптер recyclerView со списком фидов
- * Created by grishberg on 19.04.16.
+ * Created by grishberg on 19.04.16
  */
 public class FeedAdapter extends BaseRecyclerAdapter<FeedContainer, FeedAdapter.FeedViewHolder> {
     private static final String TAG = FeedAdapter.class.getSimpleName();
